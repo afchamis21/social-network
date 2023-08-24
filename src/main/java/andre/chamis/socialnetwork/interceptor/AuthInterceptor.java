@@ -49,6 +49,8 @@ public class AuthInterceptor implements HandlerInterceptor {
             throw new UnauthorizedException();
         }
 
+        // TODO: 24/08/2023 Validate session
+
         return true;
     }
 
