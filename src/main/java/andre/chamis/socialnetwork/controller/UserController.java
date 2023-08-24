@@ -17,12 +17,6 @@ import org.springframework.web.bind.annotation.*;
 public class UserController {
     private final UserService userService;
 
-//    @GetMapping("")
-//    public ResponseEntity<GetUserDTO> getCurrentUser(){
-//        GetUserDTO body = userService.getCurrentUser();
-//        return ResponseEntity.ok(body);
-//    }
-
     @NonAuthenticated
     @PostMapping("register")
     public ResponseEntity<GetUserDTO> register(@RequestBody CreateUserDTO createUserDTO) {
@@ -30,8 +24,11 @@ public class UserController {
         return new ResponseEntity<>(getUserDTO, HttpStatus.CREATED);
     }
 
-    @GetMapping("test")
-    public ResponseEntity<Integer> test(){
-        return ResponseEntity.ok(1);
+    @GetMapping("")
+    public ResponseEntity<GetUserDTO> getCurrentUser(){
+        GetUserDTO getUserDTO = userService.getCurrentUser();
+        return ResponseEntity.ok(getUserDTO);
     }
+
+    // TODO: 24/08/2023 Rota para editar usuário, listar todos os posts do usuário (passando o id pela query string mas requer jwt auth, se não passar defaultar pro logado)
 }

@@ -24,7 +24,7 @@ public class ServiceContext {
     
     private Instant endTime;
     
-    private String sessionId; // TODO: 24/08/2023 Implement session
+    private Long sessionId;
 
     public synchronized static ServiceContext getContext() {
         return getContext(null);
@@ -61,7 +61,7 @@ public class ServiceContext {
         MDC.remove(EXECUTION_ID_KEY);
     }
 
-    public static void addException(Exception ex) {
+    public synchronized static void addException(Exception ex) {
         getContext().exceptions.add(ex);
     }
 }

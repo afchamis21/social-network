@@ -1,6 +1,7 @@
 package andre.chamis.socialnetwork.service;
 
 import andre.chamis.socialnetwork.domain.auth.property.JwtProperties;
+import andre.chamis.socialnetwork.domain.session.model.Session;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.algorithms.Algorithm;
@@ -20,6 +21,7 @@ public class JwtService {
     @Value("${spring.application.name}")
     private String appName;
     private final JwtProperties jwtProperties;
+    private final String SESSION_PAYLOAD_KEY = "sessionId";
 
     private Algorithm accessTokenAlgorithm;
     private Algorithm refreshTokenAlgorithm;
@@ -30,10 +32,11 @@ public class JwtService {
         refreshTokenAlgorithm = Algorithm.HMAC256(jwtProperties.getRefreshToken().getEncryptionKey().getBytes());
     }
 
-    public String createAccessToken(String username){
+    public String createAccessToken(String username, Session session){
         return JWT.create()
                 .withSubject(username)
                 .withIssuer(appName)
+                .withClaim(SESSION_PAYLOAD_KEY, session.getSessionId())
                 .withIssuedAt(Instant.now())
                 .withExpiresAt(Instant.now().plus(
                         jwtProperties.getAccessToken().getDuration(),
@@ -41,10 +44,11 @@ public class JwtService {
                 )).sign(accessTokenAlgorithm);
     }
 
-    public String createRefreshToken(String username){
+    public String createRefreshToken(String username, Session session){
         return JWT.create()
                 .withSubject(username)
                 .withIssuer(appName)
+                .withClaim(SESSION_PAYLOAD_KEY, session.getSessionId())
                 .withIssuedAt(Instant.now())
                 .withExpiresAt(Instant.now().plus(
                         jwtProperties.getRefreshToken().getDuration(),
@@ -85,5 +89,10 @@ public class JwtService {
     public String getTokenSubject(String token) {
         DecodedJWT decodedJWT = JWT.decode(token);
         return decodedJWT.getSubject();
+    }
+
+    public Long getSessionIdFromToken(String token) {
+        DecodedJWT decodedJWT = JWT.decode(token);
+        return decodedJWT.getClaim(SESSION_PAYLOAD_KEY).asLong();
     }
 }

@@ -4,6 +4,9 @@ import andre.chamis.socialnetwork.domain.auth.model.RefreshTokenEntity;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
+import java.time.Instant;
+import java.util.Date;
+
 @Repository
 @RequiredArgsConstructor
 public class RefreshTokenEntityRepository {
@@ -18,5 +21,9 @@ public class RefreshTokenEntityRepository {
 
     public boolean existsByToken(String token) {
         return jpaRepository.existsByToken(token);
+    }
+
+    public int deleteAllExpired() {
+        return jpaRepository.deleteAllByExpireDtBefore(Date.from(Instant.now()));
     }
 }

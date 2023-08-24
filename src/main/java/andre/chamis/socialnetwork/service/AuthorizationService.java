@@ -3,7 +3,9 @@ package andre.chamis.socialnetwork.service;
 import andre.chamis.socialnetwork.domain.auth.dto.RefreshTokensDTO;
 import andre.chamis.socialnetwork.domain.auth.dto.TokensDTO;
 import andre.chamis.socialnetwork.domain.exceptions.UnauthorizedException;
+import andre.chamis.socialnetwork.domain.session.model.Session;
 import andre.chamis.socialnetwork.domain.user.dto.LoginDTO;
+import andre.chamis.socialnetwork.domain.user.model.User;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -11,6 +13,7 @@ import org.springframework.stereotype.Service;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Date;
+import java.util.Optional;
 
 @Slf4j
 @Service
@@ -19,17 +22,16 @@ public class AuthorizationService {
     private final UserService userService;
     private final JwtService jwtService;
     private final RefreshTokenService refreshTokenService;
+    private final SessionService sessionService;
 
     public TokensDTO authenticateUser(LoginDTO loginDTO) {
-        boolean isUserCredentialsValid = userService.validateUserCredential(loginDTO);
-        if (!isUserCredentialsValid){
-            throw new UnauthorizedException();
-        }
+        Optional<User> userOptional = userService.validateUserCredential(loginDTO);
+        User user = userOptional.orElseThrow(UnauthorizedException::new);
 
-        // TODO: 24/08/2023 Create session
+        Session session = sessionService.createSession(user);
 
-        String accessToken = jwtService.createAccessToken(loginDTO.username());
-        String refreshToken = jwtService.createRefreshToken(loginDTO.username());
+        String accessToken = jwtService.createAccessToken(loginDTO.username(), session);
+        String refreshToken = jwtService.createRefreshToken(loginDTO.username(), session);
 
         refreshTokenService.saveTokenToDatabase(refreshToken);
 
@@ -40,6 +42,7 @@ public class AuthorizationService {
         String refreshToken = refreshTokensDTO.refreshToken();
         boolean isTokenValid = jwtService.validateRefreshToken(refreshToken);
         if (!isTokenValid) {
+            refreshTokenService.deleteToken(refreshToken);
             throw new UnauthorizedException();
         }
 
@@ -47,11 +50,18 @@ public class AuthorizationService {
         if (!isTokenOnDatabase) {
             throw new UnauthorizedException();
         }
-
-        // TODO: 24/08/2023 Create session
-
         String username = jwtService.getTokenSubject(refreshToken);
-        String accessToken = jwtService.createAccessToken(username);
+
+        Long sessionId = jwtService.getSessionIdFromToken(refreshToken);
+        Optional<Session> sessionOptional = sessionService.findSessionById(sessionId);
+        Session session = sessionOptional.orElseThrow(() -> new UnauthorizedException("Sua sessão expirou! Faça login novamente"));
+
+        boolean isSessionValid = sessionService.validateSessionIsNotExpired(session);
+        if (!isSessionValid){
+            throw new UnauthorizedException("Sua sessão expirou! Faça login novamente");
+        }
+        
+        String accessToken = jwtService.createAccessToken(username, session);
 
         Date refreshTokenExpirationDate = jwtService.getTokenExpiresAt(refreshToken);
         Duration durationUntilRefreshTokenExpires = Duration.between(
@@ -60,7 +70,7 @@ public class AuthorizationService {
         );
 
         if (durationUntilRefreshTokenExpires.toHours() <= 2) {
-            refreshToken = jwtService.createRefreshToken(username);
+            refreshToken = jwtService.createRefreshToken(username, session);
         }
 
         return new TokensDTO(accessToken, refreshToken);

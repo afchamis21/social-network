@@ -15,7 +15,8 @@ import java.util.Date;
 public class RefreshTokenEntity {
     @Id
     @GeneratedValue
-    private Long id;
+    @Column(name = "refresh_token_id")
+    private Long refreshTokenId;
 
     private String username;
 

@@ -36,10 +36,9 @@ public class ServiceContextInterceptor implements HandlerInterceptor {
         ServiceContext context = ServiceContext.getContext();
         context.setEndTime(Instant.now());
         Duration executionTime = Duration.between(context.getStartTime(), context.getEndTime());
-
-        context.getExceptions().forEach(
-                (exception) -> log.error("An exception of type [{}] has occurred", ex.getClass().getName(), ex)
-        );
+        for (Exception exception: context.getExceptions()){
+            log.error("An exception of type [{}] has occurred", exception.getClass().getSimpleName(), exception);
+        }
 
         log.info(
                 "Finishing execution of [{} - {}] at [{}]. Execution took [{}] ms",

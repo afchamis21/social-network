@@ -1,9 +1,12 @@
 package andre.chamis.socialnetwork.interceptor;
 
+import andre.chamis.socialnetwork.context.ServiceContext;
 import andre.chamis.socialnetwork.domain.auth.annotation.JwtAuthenticated;
 import andre.chamis.socialnetwork.domain.auth.annotation.NonAuthenticated;
 import andre.chamis.socialnetwork.domain.exceptions.UnauthorizedException;
+import andre.chamis.socialnetwork.domain.session.model.Session;
 import andre.chamis.socialnetwork.service.JwtService;
+import andre.chamis.socialnetwork.service.SessionService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -21,6 +24,7 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class AuthInterceptor implements HandlerInterceptor {
     private final JwtService jwtService;
+    private final SessionService sessionService;
     @Override
     public boolean preHandle(
             @NonNull HttpServletRequest request,
@@ -49,7 +53,16 @@ public class AuthInterceptor implements HandlerInterceptor {
             throw new UnauthorizedException();
         }
 
-        // TODO: 24/08/2023 Validate session
+        Long sessionId = jwtService.getSessionIdFromToken(token);
+        Optional<Session> sessionOptional = sessionService.findSessionById(sessionId);
+        Session session = sessionOptional.orElseThrow(() -> new UnauthorizedException("Sua sessão expirou!"));
+
+        boolean isSessionValid = sessionService.validateSessionIsNotExpired(session);
+        if (!isSessionValid) {
+            throw new UnauthorizedException("Sua sessão expirou!");
+        }
+
+        ServiceContext.getContext().setSessionId(sessionId);
 
         return true;
     }

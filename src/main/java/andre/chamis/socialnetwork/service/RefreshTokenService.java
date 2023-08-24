@@ -26,11 +26,11 @@ public class RefreshTokenService {
         return refreshTokenEntityRepository.existsByToken(token);
     }
 
-    public void deleteAllExpired(){
-
+    public int deleteAllExpired(){
+        return refreshTokenEntityRepository.deleteAllExpired();
     }
 
-    public void deleteToken(){
-
+    public void deleteToken(String refreshToken){
+        refreshTokenEntityRepository.deleteRefreshToken(refreshToken);
     }
 }

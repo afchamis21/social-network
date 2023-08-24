@@ -38,4 +38,11 @@ public abstract class InMemoryCache<KeyType, ValueType> {
             put(key, value);
         }
     }
+
+    public synchronized void deleteFromList(List<ValueType> values, Function<ValueType, KeyType> keyExtractor) {
+        for (ValueType value: values){
+            KeyType key = keyExtractor.apply(value);
+            remove(key);
+        }
+    }
 }

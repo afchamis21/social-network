@@ -1,6 +1,7 @@
 package andre.chamis.socialnetwork.service;
 
 import andre.chamis.socialnetwork.domain.exceptions.InvalidUserDataException;
+import andre.chamis.socialnetwork.domain.exceptions.UserNotFoundException;
 import andre.chamis.socialnetwork.domain.user.dto.CreateUserDTO;
 import andre.chamis.socialnetwork.domain.user.dto.GetUserDTO;
 import andre.chamis.socialnetwork.domain.user.dto.LoginDTO;
@@ -20,22 +21,23 @@ import java.util.regex.Pattern;
 @RequiredArgsConstructor
 public class UserService {
     private final UserRepository userRepository;
+    private final SessionService sessionService;
 
     public GetUserDTO register(CreateUserDTO createUserDTO) {
         if (!validateEmail(createUserDTO.email())){
-            throw new InvalidUserDataException("Invalid Email!", HttpStatus.BAD_REQUEST);
+            throw new InvalidUserDataException("Email inválido!", HttpStatus.BAD_REQUEST);
         }
         
         if (!validateUsername(createUserDTO.username())){
             throw new InvalidUserDataException(
-                    "Invalid Username! The username can not contain special characters and must be larger than 3 letters",
+                    "Usuário inválido! O usuário não pode conter caracteres especiais e deve ter pelo menos 4 caracteres",
                     HttpStatus.BAD_REQUEST
             );
         }
         
         if (!validatePassword(createUserDTO.password())){
             throw new InvalidUserDataException(
-                    "Invalid Password! The password can not contain spaces and must be larger than 6 letters",
+                    "Senha inválida! A senha não pode conter espaços e deve ter pelo menos 6 caracteres",
                     HttpStatus.BAD_REQUEST
             );
         }
@@ -43,7 +45,7 @@ public class UserService {
         boolean isUserOnDatabase = userRepository.existsByUsername(createUserDTO.username());
         if (isUserOnDatabase) {
             throw new InvalidUserDataException(
-                    "Username already taken!",
+                    "Nome de usuário já está sendo utilizado!",
                     HttpStatus.BAD_REQUEST
             );
         }
@@ -105,16 +107,35 @@ public class UserService {
         return matcher.matches();
     }
 
-    public boolean validateUserCredential(LoginDTO loginDTO){
+    public Optional<User> validateUserCredential(LoginDTO loginDTO){
         Optional<User> userOptional = userRepository.findUserByUsername(loginDTO.username());
 
         if (userOptional.isEmpty()) {
-            return false;
+            return Optional.empty();
         }
         User user = userOptional.get();
 
         BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder();
-        return bCryptPasswordEncoder.matches(loginDTO.password(), user.getPassword());
+        boolean isPasswordCorrect = bCryptPasswordEncoder.matches(loginDTO.password(), user.getPassword());
+        if (!isPasswordCorrect) {
+            return Optional.empty();
+        }
+
+        return Optional.of(user);
+    }
+
+    public User findCurrentUser(){
+        Long currentUserId = sessionService.getCurrentUserId();
+        Optional<User> userOptional = findUserById(currentUserId);
+        return userOptional.orElseThrow(() -> new UserNotFoundException(HttpStatus.FORBIDDEN));
+    }
+
+    public GetUserDTO getCurrentUser(){
+        return GetUserDTO.fromUser(findCurrentUser());
+    }
+
+    private Optional<User> findUserById(Long userId) {
+        return userRepository.findById(userId);
     }
 
 //    public GetUserDTO getCurrentUser(){

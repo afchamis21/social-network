@@ -20,3 +20,6 @@ auth:
       encryption-key: "3d8d415f6e71533c37b830c6f93e5de1d8a3275b18e33f52633be458e7a2e050"
       duration: 1
       unit: days
+  session:
+    duration: 7
+    unit: days
