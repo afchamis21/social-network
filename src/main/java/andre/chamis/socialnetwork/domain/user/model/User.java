@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
+
 @NoArgsConstructor
 @Data
 @Entity
@@ -20,4 +22,10 @@ public class User {
     private String password;
 
     private String email;
+
+    @Column(name = "create_dt")
+    private LocalDateTime createDt;
+
+    @Column(name = "update_dt")
+    private LocalDateTime updateDt;
 }
