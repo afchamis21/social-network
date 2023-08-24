@@ -134,15 +134,11 @@ public class UserService {
         return GetUserDTO.fromUser(findCurrentUser());
     }
 
-    private Optional<User> findUserById(Long userId) {
+    public Optional<User> findUserById(Long userId) {
         return userRepository.findById(userId);
     }
 
-//    public GetUserDTO getCurrentUser(){
-//        Long currentUserId = sessionService.getCurrentUserId();
-//        Optional<User> userOptional = userRepository.findById(currentUserId);
-//        User user = userOptional.orElseThrow(() -> new UserNotFoundException());
-//
-//        return GetUserDTO.fromUser(user);
-//    }
+    public boolean userExistsById(Long userId) {
+        return userRepository.existsById(userId);
+    }
 }

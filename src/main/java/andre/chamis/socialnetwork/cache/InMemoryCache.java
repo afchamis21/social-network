@@ -16,6 +16,10 @@ public abstract class InMemoryCache<KeyType, ValueType> {
         cache.put(key, value);
     }
 
+    public synchronized boolean containsKey(KeyType key){
+        return cache.containsKey(key);
+    }
+
     public synchronized void remove(KeyType key){
         cache.remove(key);
     }

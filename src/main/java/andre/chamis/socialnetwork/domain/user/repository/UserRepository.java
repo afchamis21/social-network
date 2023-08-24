@@ -1,5 +1,6 @@
 package andre.chamis.socialnetwork.domain.user.repository;
 
+import andre.chamis.socialnetwork.domain.friend.relation.repository.FriendRelationJpaRepository;
 import andre.chamis.socialnetwork.domain.user.model.User;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
@@ -12,6 +13,7 @@ import java.util.Optional;
 public class UserRepository {
     private final UserJpaRepository userJpaRepository;
     private final UserInMemoryCache userInMemoryCache;
+    private final FriendRelationJpaRepository friendRelationJpaRepository;
 
     @PostConstruct
     void initializeCache(){
@@ -47,5 +49,9 @@ public class UserRepository {
 
     public Optional<User> findUserByUsername(String username){
         return userJpaRepository.findUserByUsername(username);
+    }
+
+    public boolean existsById(Long userId) {
+        return userInMemoryCache.containsKey(userId);
     }
 }

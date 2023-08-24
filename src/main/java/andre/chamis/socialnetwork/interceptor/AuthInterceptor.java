@@ -25,6 +25,7 @@ import java.util.Optional;
 public class AuthInterceptor implements HandlerInterceptor {
     private final JwtService jwtService;
     private final SessionService sessionService;
+    private final AuthInterceptorProperties authInterceptorProperties;
     @Override
     public boolean preHandle(
             @NonNull HttpServletRequest request,
@@ -33,6 +34,10 @@ public class AuthInterceptor implements HandlerInterceptor {
     ) {
         if (!(handler instanceof HandlerMethod handlerMethod)){
             return true; // Let fail for 404
+        }
+
+        if (authInterceptorProperties.getAllowedUris().contains(request.getRequestURI())){
+            return true;
         }
 
         AuthType authType = getRequestAuthType(handlerMethod);
