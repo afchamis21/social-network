@@ -1,4 +1,4 @@
-package andre.chamis.socialnetwork.domain.exceptions.dto;
+package andre.chamis.socialnetwork.domain.exception.dto;
 
 public record ExceptionDTO(
         String status,

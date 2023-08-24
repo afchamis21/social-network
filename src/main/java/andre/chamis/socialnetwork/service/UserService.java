@@ -1,7 +1,7 @@
 package andre.chamis.socialnetwork.service;
 
-import andre.chamis.socialnetwork.domain.exceptions.InvalidUserDataException;
-import andre.chamis.socialnetwork.domain.exceptions.UserNotFoundException;
+import andre.chamis.socialnetwork.domain.exception.InvalidUserDataException;
+import andre.chamis.socialnetwork.domain.exception.UserNotFoundException;
 import andre.chamis.socialnetwork.domain.user.dto.CreateUserDTO;
 import andre.chamis.socialnetwork.domain.user.dto.GetUserDTO;
 import andre.chamis.socialnetwork.domain.user.dto.LoginDTO;

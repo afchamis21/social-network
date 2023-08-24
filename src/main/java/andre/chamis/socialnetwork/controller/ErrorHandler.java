@@ -1,8 +1,8 @@
 package andre.chamis.socialnetwork.controller;
 
 import andre.chamis.socialnetwork.context.ServiceContext;
-import andre.chamis.socialnetwork.domain.exceptions.ExceptionWithStatusCode;
-import andre.chamis.socialnetwork.domain.exceptions.dto.ExceptionDTO;
+import andre.chamis.socialnetwork.domain.exception.ExceptionWithStatusCode;
+import andre.chamis.socialnetwork.domain.exception.dto.ExceptionDTO;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

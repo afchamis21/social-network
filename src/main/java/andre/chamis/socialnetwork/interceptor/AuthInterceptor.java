@@ -3,7 +3,7 @@ package andre.chamis.socialnetwork.interceptor;
 import andre.chamis.socialnetwork.context.ServiceContext;
 import andre.chamis.socialnetwork.domain.auth.annotation.JwtAuthenticated;
 import andre.chamis.socialnetwork.domain.auth.annotation.NonAuthenticated;
-import andre.chamis.socialnetwork.domain.exceptions.UnauthorizedException;
+import andre.chamis.socialnetwork.domain.exception.UnauthorizedException;
 import andre.chamis.socialnetwork.domain.session.model.Session;
 import andre.chamis.socialnetwork.service.JwtService;
 import andre.chamis.socialnetwork.service.SessionService;

@@ -1,7 +1,7 @@
 package andre.chamis.socialnetwork.service;
 
 import andre.chamis.socialnetwork.context.ServiceContext;
-import andre.chamis.socialnetwork.domain.exceptions.SessionNotFoundException;
+import andre.chamis.socialnetwork.domain.exception.SessionNotFoundException;
 import andre.chamis.socialnetwork.domain.session.model.Session;
 import andre.chamis.socialnetwork.domain.session.property.SessionProperties;
 import andre.chamis.socialnetwork.domain.session.repository.SessionRepository;

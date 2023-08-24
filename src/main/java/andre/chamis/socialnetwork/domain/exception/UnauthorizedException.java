@@ -1,4 +1,4 @@
-package andre.chamis.socialnetwork.domain.exceptions;
+package andre.chamis.socialnetwork.domain.exception;
 
 import org.springframework.http.HttpStatus;
 

@@ -2,7 +2,7 @@ package andre.chamis.socialnetwork.service;
 
 import andre.chamis.socialnetwork.domain.auth.dto.RefreshTokensDTO;
 import andre.chamis.socialnetwork.domain.auth.dto.TokensDTO;
-import andre.chamis.socialnetwork.domain.exceptions.UnauthorizedException;
+import andre.chamis.socialnetwork.domain.exception.UnauthorizedException;
 import andre.chamis.socialnetwork.domain.session.model.Session;
 import andre.chamis.socialnetwork.domain.user.dto.LoginDTO;
 import andre.chamis.socialnetwork.domain.user.model.User;
