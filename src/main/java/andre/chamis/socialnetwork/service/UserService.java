@@ -3,6 +3,7 @@ package andre.chamis.socialnetwork.service;
 import andre.chamis.socialnetwork.domain.exceptions.InvalidUserDataException;
 import andre.chamis.socialnetwork.domain.user.dto.CreateUserDTO;
 import andre.chamis.socialnetwork.domain.user.dto.GetUserDTO;
+import andre.chamis.socialnetwork.domain.user.dto.LoginDTO;
 import andre.chamis.socialnetwork.domain.user.model.User;
 import andre.chamis.socialnetwork.domain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -10,6 +11,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
+import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -37,6 +40,14 @@ public class UserService {
             );
         }
 
+        boolean isUserOnDatabase = userRepository.existsByUsername(createUserDTO.username());
+        if (isUserOnDatabase) {
+            throw new InvalidUserDataException(
+                    "Username already taken!",
+                    HttpStatus.BAD_REQUEST
+            );
+        }
+
         BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder();
         String hashedPassword = bCryptPasswordEncoder.encode(createUserDTO.password());
 
@@ -44,6 +55,8 @@ public class UserService {
         user.setUsername(createUserDTO.username());
         user.setEmail(createUserDTO.email());
         user.setPassword(hashedPassword);
+        user.setCreateDt(LocalDateTime.now());
+        user.setUpdateDt(LocalDateTime.now());
 
         user = userRepository.save(user);
 
@@ -66,10 +79,19 @@ public class UserService {
             return false;
         }
 
+        if (username.length() <= 3) {
+            return false;
+        }
+
         String usernameRegex = "^[A-Za-z0-9_-]+$";
         Pattern pattern = Pattern.compile(usernameRegex);
         Matcher matcher = pattern.matcher(username);
-        return username.length() > 3 &&  matcher.matches();
+
+        if (!matcher.matches()) {
+            return false;
+        }
+
+        return true;
     }
 
     private boolean validateEmail(String email){
@@ -81,6 +103,18 @@ public class UserService {
         Pattern pattern = Pattern.compile(emailRegex);
         Matcher matcher = pattern.matcher(email);
         return matcher.matches();
+    }
+
+    public boolean validateUserCredential(LoginDTO loginDTO){
+        Optional<User> userOptional = userRepository.findUserByUsername(loginDTO.username());
+
+        if (userOptional.isEmpty()) {
+            return false;
+        }
+        User user = userOptional.get();
+
+        BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder();
+        return bCryptPasswordEncoder.matches(loginDTO.password(), user.getPassword());
     }
 
 //    public GetUserDTO getCurrentUser(){
