@@ -5,6 +5,7 @@ import andre.chamis.socialnetwork.domain.exception.InvalidDataException;
 import andre.chamis.socialnetwork.domain.user.dto.CreateUserDTO;
 import andre.chamis.socialnetwork.domain.user.dto.GetUserDTO;
 import andre.chamis.socialnetwork.domain.user.dto.LoginDTO;
+import andre.chamis.socialnetwork.domain.user.dto.UpdateUserDTO;
 import andre.chamis.socialnetwork.domain.user.model.User;
 import andre.chamis.socialnetwork.domain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -23,8 +24,9 @@ import java.util.regex.Pattern;
 public class UserService {
     private final UserRepository userRepository;
     private final SessionService sessionService;
+    private final RefreshTokenService refreshTokenService;
 
-    public GetUserDTO register(CreateUserDTO createUserDTO) {
+    public GetUserDTO registerUser(CreateUserDTO createUserDTO) {
         if (!validateEmail(createUserDTO.email())){
             throw new InvalidDataException("Email inválido!", HttpStatus.BAD_REQUEST);
         }
@@ -90,11 +92,7 @@ public class UserService {
         Pattern pattern = Pattern.compile(usernameRegex);
         Matcher matcher = pattern.matcher(username);
 
-        if (!matcher.matches()) {
-            return false;
-        }
-
-        return true;
+        return matcher.matches();
     }
 
     private boolean validateEmail(String email){
@@ -131,15 +129,57 @@ public class UserService {
         return userOptional.orElseThrow(() -> new EntityNotFoundException(HttpStatus.FORBIDDEN));
     }
 
-    public GetUserDTO getCurrentUser(){
-        return GetUserDTO.fromUser(findCurrentUser());
-    }
-
     public Optional<User> findUserById(Long userId) {
         return userRepository.findById(userId);
     }
 
     public boolean userExistsById(Long userId) {
         return userRepository.existsById(userId);
+    }
+
+    public GetUserDTO getUserById(Optional<Long> userIdOptional) {
+        Long userId = userIdOptional.orElse(sessionService.getCurrentUserId());
+        Optional<User> userOptional = findUserById(userId);
+        User user = userOptional.orElseThrow(() -> new EntityNotFoundException("Usuário não encontrado para o id: "+ userId, HttpStatus.BAD_REQUEST));
+
+        return GetUserDTO.fromUser(user);
+    }
+
+    public GetUserDTO updateUser(UpdateUserDTO updateUserDTO) {
+        boolean updated = false;
+        boolean needsReauthentication = false;
+        User user = findCurrentUser();
+
+        String username = user.getUsername();
+
+        if (updateUserDTO.username() != null) {
+            user.setUsername(updateUserDTO.username());
+            updated = true;
+            needsReauthentication = true;
+        }
+
+        if (updateUserDTO.email() != null) {
+            user.setEmail(updateUserDTO.email());
+            updated = true;
+        }
+
+        if (updateUserDTO.password() != null) {
+            BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder();
+            String hashedPassword = bCryptPasswordEncoder.encode(updateUserDTO.password());
+            user.setPassword(hashedPassword);
+            updated = true;
+            needsReauthentication = true;
+        }
+
+        if (updated){
+            user = userRepository.save(user);
+        }
+
+        if (needsReauthentication) {
+            sessionService.deleteCurrentSession();
+            refreshTokenService.deleteTokenByUsername(username);
+        }
+
+        return GetUserDTO.fromUser(user);
     }
 }
