@@ -75,4 +75,10 @@ public class AuthorizationService {
 
         return new TokensDTO(accessToken, refreshToken);
     }
+
+    public void logout() {
+        User currentUser = userService.findCurrentUser();
+        refreshTokenService.deleteTokenByUsername(currentUser.getUsername());
+        sessionService.deleteCurrentSession();
+    }
 }

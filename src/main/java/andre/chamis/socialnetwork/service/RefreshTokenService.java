@@ -33,4 +33,8 @@ public class RefreshTokenService {
     public void deleteToken(String refreshToken){
         refreshTokenEntityRepository.deleteRefreshToken(refreshToken);
     }
+
+    public void deleteTokenByUsername(String username) {
+        refreshTokenEntityRepository.deleteByUsername(username);
+    }
 }

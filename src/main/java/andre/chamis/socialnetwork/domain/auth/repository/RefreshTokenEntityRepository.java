@@ -26,4 +26,8 @@ public class RefreshTokenEntityRepository {
     public int deleteAllExpired() {
         return jpaRepository.deleteAllByExpireDtBefore(Date.from(Instant.now()));
     }
+
+    public void deleteByUsername(String username){
+        jpaRepository.deleteAllByUsername(username);
+    }
 }

@@ -47,4 +47,8 @@ public class SessionService {
     public boolean validateSessionIsNotExpired(Session session) {
         return session.getExpireDt().after(Date.from(Instant.now()));
     }
+
+    public void deleteCurrentSession() {
+        sessionRepository.deleteSessionById(ServiceContext.getContext().getSessionId());
+    }
 }

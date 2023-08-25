@@ -48,4 +48,9 @@ public class SessionRepository {
         inMemoryCache.deleteFromList(deletedSessions, Session::getSessionId);
         return deletedSessions.size();
     }
+
+    public void deleteSessionById(Long sessionId) {
+        jpaRepository.deleteById(sessionId);
+        inMemoryCache.remove(sessionId);
+    }
 }

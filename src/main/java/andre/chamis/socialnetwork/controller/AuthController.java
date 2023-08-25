@@ -1,5 +1,6 @@
 package andre.chamis.socialnetwork.controller;
 
+import andre.chamis.socialnetwork.domain.auth.annotation.JwtAuthenticated;
 import andre.chamis.socialnetwork.domain.auth.annotation.NonAuthenticated;
 import andre.chamis.socialnetwork.domain.auth.dto.RefreshTokensDTO;
 import andre.chamis.socialnetwork.domain.auth.dto.TokensDTO;
@@ -28,5 +29,12 @@ public class AuthController {
     public ResponseEntity<TokensDTO> refresh(@RequestBody RefreshTokensDTO refreshTokensDTO)  {
         TokensDTO tokensDTO = authorizationService.refreshTokens(refreshTokensDTO);
         return ResponseEntity.ok(tokensDTO);
+    }
+
+    @JwtAuthenticated
+    @PostMapping("logout")
+    public ResponseEntity<Void> logout(){
+        authorizationService.logout();
+        return ResponseEntity.ok().build();
     }
 }
