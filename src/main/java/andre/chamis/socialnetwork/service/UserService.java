@@ -12,7 +12,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
+import java.util.Date;
 import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -57,8 +58,8 @@ public class UserService {
         user.setUsername(createUserDTO.username());
         user.setEmail(createUserDTO.email());
         user.setPassword(hashedPassword);
-        user.setCreateDt(LocalDateTime.now());
-        user.setUpdateDt(LocalDateTime.now());
+        user.setCreateDt(Date.from(Instant.now()));
+        user.setUpdateDt(Date.from(Instant.now()));
 
         user = userRepository.save(user);
 

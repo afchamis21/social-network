@@ -1,17 +1,13 @@
 package andre.chamis.socialnetwork.domain.auth.model;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
 import java.util.Date;
 
 @Data
 @Entity
 @Table(name = "refresh_tokens")
-@AllArgsConstructor
-@NoArgsConstructor
 public class RefreshTokenEntity {
     @Id
     @GeneratedValue

@@ -2,12 +2,10 @@ package andre.chamis.socialnetwork.domain.friend.relation.model;
 
 import jakarta.persistence.*;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
 @Data
 @Entity
 @Table(name = "friends")
-@NoArgsConstructor
 public class FriendRelation {
     @Id
     @GeneratedValue
