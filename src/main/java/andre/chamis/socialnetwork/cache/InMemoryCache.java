@@ -49,4 +49,8 @@ public abstract class InMemoryCache<KeyType, ValueType> {
             remove(key);
         }
     }
+
+    public synchronized int getSize() {
+        return cache.size();
+    }
 }

@@ -1,11 +1,11 @@
 package andre.chamis.socialnetwork.domain.user.repository;
 
-import andre.chamis.socialnetwork.domain.friend.relation.repository.FriendRelationJpaRepository;
 import andre.chamis.socialnetwork.domain.user.model.User;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -13,11 +13,12 @@ import java.util.Optional;
 public class UserRepository {
     private final UserJpaRepository userJpaRepository;
     private final UserInMemoryCache userInMemoryCache;
-    private final FriendRelationJpaRepository friendRelationJpaRepository;
 
     @PostConstruct
-    void initializeCache(){
-        userInMemoryCache.initializeCache(userJpaRepository.findAll(), User::getUserId);
+    public int initializeCache(){
+        List<User> users = userJpaRepository.findAll();
+        userInMemoryCache.initializeCache(users, User::getUserId);
+        return userInMemoryCache.getSize();
     }
 
     public Optional<User> findById(Long userId){
