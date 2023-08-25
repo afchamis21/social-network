@@ -86,8 +86,8 @@ public class PostService {
                 .withUser(user);
     }
 
-    public int deleteAllPosts() {
+    public void deleteAllPosts() {
         log.warn("Deleting all posts");
-        return postRepository.deleteAllPosts();
+        postRepository.deleteAllPosts();
     }
 }

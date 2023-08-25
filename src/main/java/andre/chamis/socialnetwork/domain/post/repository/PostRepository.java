@@ -29,7 +29,7 @@ public class PostRepository {
         return postJpaRepository.findById(postId);
     }
 
-    public int deleteAllPosts() {
-        return postJpaRepository.deleteAllPosts();
+    public void deleteAllPosts() {
+        postJpaRepository.deleteAll();
     }
 }

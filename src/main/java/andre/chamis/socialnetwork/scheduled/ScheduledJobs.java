@@ -45,14 +45,13 @@ public class ScheduledJobs {
         );
     }
 
-    @Scheduled(cron = "0 0 0 * * *") // Every day at 00:00
+    @Scheduled(cron = " 0 0 * * *") // Every day at 00:00
     public void deleteAllPosts(){
         Instant executionStart = Instant.now();
-        int deletedPosts = postService.deleteAllPosts();
+        postService.deleteAllPosts();
         Instant executionEnd = Instant.now();
         log.info(
-                "Deleted [{} posts]. Execution tool [{} ms]",
-                deletedPosts,
+                "Deleted ALL posts. Execution tool [{} ms]",
                 Duration.between(executionStart, executionEnd).toMillis()
         );
     }
