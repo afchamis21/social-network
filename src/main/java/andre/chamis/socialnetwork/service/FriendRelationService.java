@@ -1,6 +1,6 @@
 package andre.chamis.socialnetwork.service;
 
-import andre.chamis.socialnetwork.domain.exception.UserNotFoundException;
+import andre.chamis.socialnetwork.domain.exception.EntityNotFoundException;
 import andre.chamis.socialnetwork.domain.friend.relation.dto.RemoveFriendDTO;
 import andre.chamis.socialnetwork.domain.friend.relation.model.FriendRelation;
 import andre.chamis.socialnetwork.domain.friend.relation.repository.FriendRelationRepository;
@@ -29,7 +29,7 @@ public class FriendRelationService {
         Page<FriendRelation> friendRelations = friendRelationRepository.findUserFriends(currentUserId, pageable);
         Page<User> friends = friendRelations.map(
                 friendRelation ->
-                    userService.findUserById(friendRelation.getUserId2()).orElseThrow(() -> new UserNotFoundException(HttpStatus.INTERNAL_SERVER_ERROR))
+                    userService.findUserById(friendRelation.getUserId2()).orElseThrow(() -> new EntityNotFoundException(HttpStatus.INTERNAL_SERVER_ERROR))
 
         );
         return friends.map(GetUserDTO::fromUser);

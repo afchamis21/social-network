@@ -1,7 +1,7 @@
 package andre.chamis.socialnetwork.service;
 
-import andre.chamis.socialnetwork.domain.exception.InvalidUserDataException;
-import andre.chamis.socialnetwork.domain.exception.UserNotFoundException;
+import andre.chamis.socialnetwork.domain.exception.EntityNotFoundException;
+import andre.chamis.socialnetwork.domain.exception.InvalidDataException;
 import andre.chamis.socialnetwork.domain.user.dto.CreateUserDTO;
 import andre.chamis.socialnetwork.domain.user.dto.GetUserDTO;
 import andre.chamis.socialnetwork.domain.user.dto.LoginDTO;
@@ -26,18 +26,18 @@ public class UserService {
 
     public GetUserDTO register(CreateUserDTO createUserDTO) {
         if (!validateEmail(createUserDTO.email())){
-            throw new InvalidUserDataException("Email inválido!", HttpStatus.BAD_REQUEST);
+            throw new InvalidDataException("Email inválido!", HttpStatus.BAD_REQUEST);
         }
         
         if (!validateUsername(createUserDTO.username())){
-            throw new InvalidUserDataException(
+            throw new InvalidDataException(
                     "Usuário inválido! O usuário não pode conter caracteres especiais e deve ter pelo menos 4 caracteres",
                     HttpStatus.BAD_REQUEST
             );
         }
         
         if (!validatePassword(createUserDTO.password())){
-            throw new InvalidUserDataException(
+            throw new InvalidDataException(
                     "Senha inválida! A senha não pode conter espaços e deve ter pelo menos 6 caracteres",
                     HttpStatus.BAD_REQUEST
             );
@@ -45,7 +45,7 @@ public class UserService {
 
         boolean isUserOnDatabase = userRepository.existsByUsername(createUserDTO.username());
         if (isUserOnDatabase) {
-            throw new InvalidUserDataException(
+            throw new InvalidDataException(
                     "Nome de usuário já está sendo utilizado!",
                     HttpStatus.BAD_REQUEST
             );
@@ -128,7 +128,7 @@ public class UserService {
     public User findCurrentUser(){
         Long currentUserId = sessionService.getCurrentUserId();
         Optional<User> userOptional = findUserById(currentUserId);
-        return userOptional.orElseThrow(() -> new UserNotFoundException(HttpStatus.FORBIDDEN));
+        return userOptional.orElseThrow(() -> new EntityNotFoundException(HttpStatus.FORBIDDEN));
     }
 
     public GetUserDTO getCurrentUser(){

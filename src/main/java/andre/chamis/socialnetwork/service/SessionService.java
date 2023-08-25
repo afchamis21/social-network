@@ -1,7 +1,7 @@
 package andre.chamis.socialnetwork.service;
 
 import andre.chamis.socialnetwork.context.ServiceContext;
-import andre.chamis.socialnetwork.domain.exception.SessionNotFoundException;
+import andre.chamis.socialnetwork.domain.exception.EntityNotFoundException;
 import andre.chamis.socialnetwork.domain.session.model.Session;
 import andre.chamis.socialnetwork.domain.session.property.SessionProperties;
 import andre.chamis.socialnetwork.domain.session.repository.SessionRepository;
@@ -40,7 +40,7 @@ public class SessionService {
     public Long getCurrentUserId(){
         Long sessionId = ServiceContext.getContext().getSessionId();
         Optional<Session> sessionOptional = findSessionById(sessionId);
-        Session session = sessionOptional.orElseThrow(() -> new SessionNotFoundException(HttpStatus.FORBIDDEN));
+        Session session = sessionOptional.orElseThrow(() -> new EntityNotFoundException(HttpStatus.FORBIDDEN));
         return session.getUserId();
     }
 

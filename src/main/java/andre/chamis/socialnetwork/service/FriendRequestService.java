@@ -1,9 +1,8 @@
 package andre.chamis.socialnetwork.service;
 
+import andre.chamis.socialnetwork.domain.exception.EntityNotFoundException;
 import andre.chamis.socialnetwork.domain.exception.ForbiddenException;
-import andre.chamis.socialnetwork.domain.exception.FriendRequestNotFoundException;
 import andre.chamis.socialnetwork.domain.exception.UserAlreadyFriendsException;
-import andre.chamis.socialnetwork.domain.exception.UserNotFoundException;
 import andre.chamis.socialnetwork.domain.friend.relation.model.FriendRelation;
 import andre.chamis.socialnetwork.domain.friend.request.dto.AcceptFriendRequestDTO;
 import andre.chamis.socialnetwork.domain.friend.request.dto.CancelFriendRequestDTO;
@@ -30,7 +29,7 @@ public class FriendRequestService {
 
         boolean userExists = userService.userExistsById(targetId);
         if (!userExists) {
-            throw new UserNotFoundException(HttpStatus.BAD_REQUEST);
+            throw new EntityNotFoundException(HttpStatus.BAD_REQUEST);
         }
 
         boolean areUsersAlreadyFriends = friendRelationService.existsFriendRelationByUserIds(currentUserId, targetId);
@@ -54,7 +53,7 @@ public class FriendRequestService {
     public void acceptFriendRequest(AcceptFriendRequestDTO acceptFriendRequestDTO){
         Long requestId = acceptFriendRequestDTO.requestId();
         Optional<FriendRequest> friendRequestOptional = friendRequestRepository.findFriendRequestByRequestId(requestId);
-        FriendRequest friendRequest = friendRequestOptional.orElseThrow(() -> new FriendRequestNotFoundException(requestId));
+        FriendRequest friendRequest = friendRequestOptional.orElseThrow(() -> new EntityNotFoundException("Solicitação de amizade não encontrada com o id: " + requestId, HttpStatus.BAD_REQUEST));
         acceptFriendRequest(friendRequest);
     }
 
