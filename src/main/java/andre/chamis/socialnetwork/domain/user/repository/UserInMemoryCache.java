@@ -8,8 +8,17 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+/**
+ * An {@link InMemoryCache} for caching user entities in memory.
+ */
 @Repository
 public class UserInMemoryCache extends InMemoryCache<Long, User> {
+    /**
+     * Finds and returns a set of users with usernames that match the given prefix.
+     *
+     * @param username The username prefix to match against.
+     * @return A set of users with matching usernames.
+     */
     public Set<User> findAllWithMatchingUsername(String username){
         Map<Long, User> cache = super.getCache();
 

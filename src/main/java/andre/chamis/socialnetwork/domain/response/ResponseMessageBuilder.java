@@ -7,7 +7,19 @@ import org.springframework.http.ResponseEntity;
 
 import java.util.Set;
 
+/**
+ * Utility class for building response messages with metadata.
+ */
 public class ResponseMessageBuilder {
+
+    /**
+     * Builds a response entity with a body and HTTP status, including metadata.
+     *
+     * @param <T>        The type of the response body.
+     * @param body       The response body.
+     * @param httpStatus The HTTP status to include in the response.
+     * @return A response entity containing the response message.
+     */
     public static <T> ResponseEntity<ResponseMessage<T>> build(T body, HttpStatus httpStatus){
         Metadata metadata = buildMetadata();
 
@@ -18,6 +30,12 @@ public class ResponseMessageBuilder {
         return new ResponseEntity<>(responseMessage, httpStatus);
     }
 
+    /**
+     * Builds a response entity with an empty body and an HTTP status, including metadata.
+     *
+     * @param httpStatus The HTTP status to include in the response.
+     * @return A response entity containing the response message.
+     */
     public static <Void> ResponseEntity<ResponseMessage<Void>> build(HttpStatus httpStatus){
         Metadata metadata = buildMetadata();
 
@@ -27,6 +45,12 @@ public class ResponseMessageBuilder {
         return new ResponseEntity<>(responseMessage, httpStatus);
     }
 
+    /**
+     * Builds a response entity for an exception with an associated status, including metadata.
+     *
+     * @param exception The exception with an associated status.
+     * @return A response entity containing the response message.
+     */
     public static ResponseEntity<ResponseMessage<Void>> build(ExceptionWithStatusCode exception){
         Metadata metadata = buildMetadata();
 
@@ -36,6 +60,12 @@ public class ResponseMessageBuilder {
         return new ResponseEntity<>(responseMessage, exception.getHttpStatus());
     }
 
+    /**
+     * Builds a response entity for a generic exception, including metadata.
+     *
+     * @param exception The exception to be included in the response.
+     * @return A response entity containing the response message.
+     */
     public static ResponseEntity<ResponseMessage<Void>> build(Exception exception){
         Metadata metadata = buildMetadata();
 
@@ -45,6 +75,11 @@ public class ResponseMessageBuilder {
         return new ResponseEntity<>(responseMessage, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
+    /**
+     * Builds the metadata for the response message.
+     *
+     * @return The metadata containing messages.
+     */
     private static Metadata buildMetadata(){
         Set<String> messages = ServiceContext.getContext().getMetadataMessages();
         Metadata metadata = new Metadata();
