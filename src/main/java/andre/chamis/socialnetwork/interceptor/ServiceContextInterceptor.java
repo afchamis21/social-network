@@ -47,5 +47,7 @@ public class ServiceContextInterceptor implements HandlerInterceptor {
                 context.getEndTime(),
                 executionTime.toMillis()
         );
+
+        ServiceContext.clearContext();
     }
 }
