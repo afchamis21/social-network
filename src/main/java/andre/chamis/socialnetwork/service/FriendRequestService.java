@@ -7,10 +7,14 @@ import andre.chamis.socialnetwork.domain.exception.UserAlreadyFriendsException;
 import andre.chamis.socialnetwork.domain.friend.relation.model.FriendRelation;
 import andre.chamis.socialnetwork.domain.friend.request.dto.AcceptFriendRequestDTO;
 import andre.chamis.socialnetwork.domain.friend.request.dto.CancelFriendRequestDTO;
+import andre.chamis.socialnetwork.domain.friend.request.dto.GetFriendRequestDTO;
 import andre.chamis.socialnetwork.domain.friend.request.dto.SendFriendRequestDTO;
 import andre.chamis.socialnetwork.domain.friend.request.model.FriendRequest;
 import andre.chamis.socialnetwork.domain.friend.request.repository.FriendRequestRepository;
+import andre.chamis.socialnetwork.domain.user.model.User;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
@@ -26,33 +30,39 @@ public class FriendRequestService {
     private final FriendRequestRepository friendRequestRepository;
     private final UserService userService;
 
-    public void sendFriendRequest(SendFriendRequestDTO sendFriendRequestDTO){
+    public GetFriendRequestDTO sendFriendRequest(SendFriendRequestDTO sendFriendRequestDTO){
         Long targetId = sendFriendRequestDTO.userId();
-        Long currentUserId = sessionService.getCurrentUserId();
 
-        boolean userExists = userService.userExistsById(targetId);
-        if (!userExists) {
-            throw new EntityNotFoundException(HttpStatus.BAD_REQUEST);
-        }
+        User currentUser = userService.findCurrentUser();
 
-        boolean areUsersAlreadyFriends = friendRelationService.existsFriendRelationByUserIds(currentUserId, targetId);
+        Optional<User> targetUserOptional = userService.findUserById(targetId);
+        User targetUser = targetUserOptional.orElseThrow(() -> new EntityNotFoundException(HttpStatus.BAD_REQUEST));
+
+        boolean areUsersAlreadyFriends = friendRelationService.existsFriendRelationByUserIds(currentUser.getUserId(), targetId);
         if (areUsersAlreadyFriends) {
             throw new UserAlreadyFriendsException("Os usuários ja são amigos!");
         }
 
-        Optional<FriendRequest> friendRequestOptional = friendRequestRepository.findFriendRequestByUserIds(currentUserId, targetId);
+        Optional<FriendRequest> friendRequestOptional = friendRequestRepository.findFriendRequestByUserIds(currentUser.getUserId(), targetId);
         if (friendRequestOptional.isPresent()) {
             acceptFriendRequest(friendRequestOptional.get());
-            return;
+            return new GetFriendRequestDTO()
+                    .withFriendRequest(friendRequestOptional.get())
+                    .withSender(userService.findCurrentUser())
+                    .withReceiver(targetUser);
         }
 
         FriendRequest friendRequest = new FriendRequest();
-        friendRequest.setSender(currentUserId);
+        friendRequest.setSender(currentUser.getUserId());
         friendRequest.setReceiver(targetId);
 
-        friendRequestRepository.createFriendRequest(friendRequest);
+        friendRequest = friendRequestRepository.createFriendRequest(friendRequest);
 
-        ServiceContext.addMessage("Solicitação enviada com sucesso!");
+        return new GetFriendRequestDTO()
+                .withFriendRequest(friendRequest)
+                .withSender(userService.findCurrentUser())
+                .withReceiver(targetUser);
+
     }
 
     public void acceptFriendRequest(AcceptFriendRequestDTO acceptFriendRequestDTO){
@@ -97,5 +107,21 @@ public class FriendRequestService {
         deleteFriendRequest(cancelFriendRequestDTO.requestId());
 
         ServiceContext.addMessage("Solicitação cancelada!");
+    }
+
+    public Page<GetFriendRequestDTO> findAllFriendRequestsToCurrentUser(Pageable pageable){
+        User currentUser = userService.findCurrentUser();
+
+        Page<FriendRequest> friendRequests = friendRequestRepository.findByReceiverId(currentUser.getUserId(), pageable);
+
+        return friendRequests.map(friendRequest -> {
+            Optional<User> senderOptional = userService.findUserById(friendRequest.getSender());
+            User sender = senderOptional.orElseThrow(() -> new EntityNotFoundException(HttpStatus.INTERNAL_SERVER_ERROR));
+
+            return new GetFriendRequestDTO()
+                    .withFriendRequest(friendRequest)
+                    .withSender(sender)
+                    .withReceiver(currentUser);
+        });
     }
 }
