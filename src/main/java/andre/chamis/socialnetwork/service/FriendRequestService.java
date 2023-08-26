@@ -65,7 +65,7 @@ public class FriendRequestService {
     private void acceptFriendRequest(FriendRequest friendRequest){
         Long currentUserId = sessionService.getCurrentUserId();
 
-        if (currentUserId != friendRequest.getReceiver() && currentUserId != friendRequest.getSender()) {
+        if (!currentUserId.equals(friendRequest.getReceiver()) && !currentUserId.equals(friendRequest.getSender())) {
             throw new ForbiddenException("Você não tem permissão para isso!");
         }
 

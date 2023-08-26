@@ -37,8 +37,4 @@ public class PostRepository {
     public boolean existsById(Long postId) {
         return postJpaRepository.existsById(postId);
     }
-
-    public boolean existsByIdAndOwnerId(Long postId, Long ownerId){
-        return postJpaRepository.existsByPostIdAndOwnerId(postId, ownerId);
-    }
 }
