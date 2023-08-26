@@ -90,4 +90,12 @@ public class PostService {
         log.warn("Deleting all posts");
         postRepository.deleteAllPosts();
     }
+
+    public boolean checkExistsPostById(Long postId){
+        return postRepository.existsById(postId);
+    }
+
+    public Optional<Post> findPostById(Long postId){
+        return postRepository.findPostById(postId);
+    }
 }

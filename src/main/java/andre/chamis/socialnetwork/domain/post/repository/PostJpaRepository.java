@@ -10,5 +10,5 @@ import org.springframework.stereotype.Repository;
 public interface PostJpaRepository extends JpaRepository<Post, Long> {
     Page<Post> findByOwnerId(Long ownerId, Pageable pageable);
 
-    void deleteByPostIdAndOwnerId(Long postId, Long ownerId);
+    boolean existsByPostIdAndOwnerId(Long postId, Long ownerId);
 }

@@ -12,6 +12,7 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class PostRepository {
     private final PostJpaRepository postJpaRepository;
+    private final PostDAO postDAO;
 
     public Post save(Post post) {
         return postJpaRepository.save(post);
@@ -22,7 +23,7 @@ public class PostRepository {
     }
 
     public void delete(Long postId, Long ownerId) {
-        postJpaRepository.deleteByPostIdAndOwnerId(postId, ownerId);
+        postDAO.deletePostById(postId, ownerId);
     }
 
     public Optional<Post> findPostById(Long postId) {
@@ -31,5 +32,13 @@ public class PostRepository {
 
     public void deleteAllPosts() {
         postJpaRepository.deleteAll();
+    }
+
+    public boolean existsById(Long postId) {
+        return postJpaRepository.existsById(postId);
+    }
+
+    public boolean existsByIdAndOwnerId(Long postId, Long ownerId){
+        return postJpaRepository.existsByPostIdAndOwnerId(postId, ownerId);
     }
 }

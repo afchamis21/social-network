@@ -1,7 +1,7 @@
 package andre.chamis.socialnetwork.domain.comment.dto;
 
-public record CreateCommentDTO(
-        Long postId,
+public record EditCommentDTO(
+        Long commentId,
         String content
 ) {
 }
