@@ -1,5 +1,6 @@
 package andre.chamis.socialnetwork.service;
 
+import andre.chamis.socialnetwork.context.ServiceContext;
 import andre.chamis.socialnetwork.domain.exception.EntityNotFoundException;
 import andre.chamis.socialnetwork.domain.exception.ForbiddenException;
 import andre.chamis.socialnetwork.domain.exception.UserAlreadyFriendsException;
@@ -13,6 +14,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
+import java.time.Instant;
+import java.util.Date;
 import java.util.Optional;
 
 @Service
@@ -48,6 +51,8 @@ public class FriendRequestService {
         friendRequest.setReceiver(targetId);
 
         friendRequestRepository.createFriendRequest(friendRequest);
+
+        ServiceContext.addMessage("Solicitação enviada com sucesso!");
     }
 
     public void acceptFriendRequest(AcceptFriendRequestDTO acceptFriendRequestDTO){
@@ -64,16 +69,22 @@ public class FriendRequestService {
             throw new ForbiddenException("Você não tem permissão para isso!");
         }
 
+        Date now = Date.from(Instant.now());
+
         FriendRelation friendRelation1 = new FriendRelation();
         friendRelation1.setUserId1(friendRequest.getReceiver());
         friendRelation1.setUserId2(friendRequest.getSender());
+        friendRelation1.setCreateDt(now);
 
         FriendRelation friendRelation2 = new FriendRelation();
         friendRelation2.setUserId1(friendRequest.getSender());
         friendRelation2.setUserId2(friendRequest.getReceiver());
+        friendRelation2.setCreateDt(now);
 
         friendRelationService.createFriendRelation(friendRelation1);
         friendRelationService.createFriendRelation(friendRelation2);
+
+        ServiceContext.addMessage("Solicitação aceita!");
 
         deleteFriendRequest(friendRequest.getFriendRequestId());
     }
@@ -84,5 +95,7 @@ public class FriendRequestService {
 
     public void cancelFriendRequest(CancelFriendRequestDTO cancelFriendRequestDTO) {
         deleteFriendRequest(cancelFriendRequestDTO.requestId());
+
+        ServiceContext.addMessage("Solicitação cancelada!");
     }
 }

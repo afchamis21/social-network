@@ -45,7 +45,7 @@ public class ScheduledJobs {
         );
     }
 
-    @Scheduled(cron = " 0 0 * * *") // Every day at 00:00
+    @Scheduled(cron = " 0 0 0 * * *") // Every day at 00:00
     public void deleteAllPosts(){
         Instant executionStart = Instant.now();
         postService.deleteAllPosts();

@@ -1,5 +1,6 @@
 package andre.chamis.socialnetwork.domain.exception;
 
+import andre.chamis.socialnetwork.context.ServiceContext;
 import lombok.Getter;
 import org.springframework.http.HttpStatus;
 
@@ -14,5 +15,6 @@ public abstract class ExceptionWithStatusCode extends RuntimeException {
     public ExceptionWithStatusCode(String message, HttpStatus httpStatus) {
         super(message);
         this.httpStatus = httpStatus;
+        ServiceContext.addMessage(message);
     }
 }

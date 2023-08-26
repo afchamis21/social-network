@@ -5,9 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.slf4j.MDC;
 
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 @Data
 @Slf4j
@@ -17,6 +15,8 @@ public class ServiceContext {
     private static ThreadLocal<ServiceContext> threadLocal = new ThreadLocal<>();
 
     private String executionId;
+
+    private Set<String> metadataMessages = new HashSet<>();
 
     private List<Exception> exceptions = new ArrayList<>();
 
@@ -63,5 +63,13 @@ public class ServiceContext {
 
     public synchronized static void addException(Exception ex) {
         getContext().exceptions.add(ex);
+    }
+
+    public Set<String> getMetadataMessages() {
+        return metadataMessages;
+    }
+
+    public synchronized static void addMessage(String message){
+        getContext().metadataMessages.add(message);
     }
 }

@@ -3,6 +3,8 @@ package andre.chamis.socialnetwork.domain.friend.relation.model;
 import jakarta.persistence.*;
 import lombok.Data;
 
+import java.util.Date;
+
 @Data
 @Entity
 @Table(name = "friends")
@@ -17,4 +19,7 @@ public class FriendRelation {
 
     @Column(name = "user_id_2")
     private long userId2;
+
+    @Column(name = "create_dt")
+    private Date createDt;
 }

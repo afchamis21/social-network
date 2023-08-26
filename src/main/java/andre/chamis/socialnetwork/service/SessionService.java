@@ -49,6 +49,10 @@ public class SessionService {
     }
 
     public void deleteCurrentSession() {
-        sessionRepository.deleteSessionById(ServiceContext.getContext().getSessionId());
+        deleteSessionById(ServiceContext.getContext().getSessionId());
+    }
+
+    public void deleteSessionById(Long sessionId) {
+        sessionRepository.deleteSessionById(sessionId);
     }
 }

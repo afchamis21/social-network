@@ -26,7 +26,7 @@ public class AuthorizationService {
 
     public TokensDTO authenticateUser(LoginDTO loginDTO) {
         Optional<User> userOptional = userService.validateUserCredential(loginDTO);
-        User user = userOptional.orElseThrow(UnauthorizedException::new);
+        User user = userOptional.orElseThrow(() -> new UnauthorizedException("Credenciais inválidas!"));
 
         Session session = sessionService.createSession(user);
 
@@ -43,12 +43,12 @@ public class AuthorizationService {
         boolean isTokenValid = jwtService.validateRefreshToken(refreshToken);
         if (!isTokenValid) {
             refreshTokenService.deleteToken(refreshToken);
-            throw new UnauthorizedException();
+            throw new UnauthorizedException("Token inválido");
         }
 
         boolean isTokenOnDatabase = refreshTokenService.existsOnDatabase(refreshToken);
         if (!isTokenOnDatabase) {
-            throw new UnauthorizedException();
+            throw new UnauthorizedException("Token inválido");
         }
         String username = jwtService.getTokenSubject(refreshToken);
 

@@ -6,6 +6,7 @@ import com.auth0.jwt.JWT;
 import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTVerificationException;
+import com.auth0.jwt.exceptions.TokenExpiredException;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
@@ -21,6 +22,7 @@ public class JwtService {
     @Value("${spring.application.name}")
     private String appName;
     private final JwtProperties jwtProperties;
+    private final SessionService sessionService;
     private final String SESSION_PAYLOAD_KEY = "sessionId";
 
     private Algorithm accessTokenAlgorithm;
@@ -61,6 +63,10 @@ public class JwtService {
             JWTVerifier verifier = JWT.require(accessTokenAlgorithm).withIssuer(appName).build();
             verifier.verify(token);
             return true;
+        } catch (TokenExpiredException ex) {
+            Long sessionId = getSessionIdFromToken(token);
+            sessionService.deleteSessionById(sessionId);
+            return false;
         } catch (JWTVerificationException ex) {
             return false;
         }

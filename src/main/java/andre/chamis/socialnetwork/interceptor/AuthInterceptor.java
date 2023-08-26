@@ -55,7 +55,7 @@ public class AuthInterceptor implements HandlerInterceptor {
 
         boolean isTokenValid = jwtService.validateAccessToken(token);
         if (!isTokenValid){
-            throw new UnauthorizedException();
+            throw new UnauthorizedException("Token inválido!");
         }
 
         Long sessionId = jwtService.getSessionIdFromToken(token);
@@ -64,6 +64,7 @@ public class AuthInterceptor implements HandlerInterceptor {
 
         boolean isSessionValid = sessionService.validateSessionIsNotExpired(session);
         if (!isSessionValid) {
+            sessionService.deleteSessionById(sessionId);
             throw new UnauthorizedException("Sua sessão expirou!");
         }
 

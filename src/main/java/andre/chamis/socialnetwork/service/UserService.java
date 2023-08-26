@@ -172,6 +172,7 @@ public class UserService {
         }
 
         if (updated){
+            user.setUpdateDt(Date.from(Instant.now()));
             user = userRepository.save(user);
         }
 
