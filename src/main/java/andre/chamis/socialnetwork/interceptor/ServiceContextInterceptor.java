@@ -3,6 +3,7 @@ package andre.chamis.socialnetwork.interceptor;
 import andre.chamis.socialnetwork.context.ServiceContext;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
@@ -14,7 +15,7 @@ import java.time.Instant;
 @Component
 public class ServiceContextInterceptor implements HandlerInterceptor {
     @Override
-    public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
+    public boolean preHandle(HttpServletRequest request, HttpServletResponse response,@NonNull Object handler) {
         String executionId = request.getHeader(ServiceContext.EXECUTION_ID_KEY);
         ServiceContext context = ServiceContext.getContext(executionId);
         context.setStartTime(Instant.now());
@@ -32,7 +33,7 @@ public class ServiceContextInterceptor implements HandlerInterceptor {
     }
 
     @Override
-    public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex) throws Exception {
+    public void afterCompletion(@NonNull HttpServletRequest request,@NonNull HttpServletResponse response,@NonNull Object handler, Exception ex)  {
         ServiceContext context = ServiceContext.getContext();
         context.setEndTime(Instant.now());
         Duration executionTime = Duration.between(context.getStartTime(), context.getEndTime());
