@@ -43,7 +43,7 @@ public class CommentService {
         Comment comment = new Comment();
         comment.setPostId(createCommentDTO.postId());
         comment.setOwnerId(currentUser.getUserId());
-        comment.setContent(comment.getContent());
+        comment.setContent(createCommentDTO.content());
         comment.setCreateDt(now);
         comment.setUpdateDt(now);
 
