@@ -19,6 +19,10 @@ import org.springframework.web.servlet.HandlerInterceptor;
 
 import java.util.Optional;
 
+/**
+ * Interceptor responsible for enforcing authentication and authorization for incoming requests.
+ * It validates JWT tokens and checks for authentication requirements specified by annotations.
+ */
 @Slf4j
 @Component
 @RequiredArgsConstructor
@@ -26,6 +30,15 @@ public class AuthInterceptor implements HandlerInterceptor {
     private final JwtService jwtService;
     private final SessionService sessionService;
     private final AuthInterceptorProperties authInterceptorProperties;
+
+    /**
+     * Pre-handle method of the interceptor, responsible for enforcing authentication and authorization.
+     *
+     * @param request  The incoming HTTP request.
+     * @param response The HTTP response.
+     * @param handler  The handler method being executed.
+     * @return True if the request is allowed, false otherwise.
+     */
     @Override
     public boolean preHandle(
             @NonNull HttpServletRequest request,
@@ -48,6 +61,12 @@ public class AuthInterceptor implements HandlerInterceptor {
         };
     }
 
+    /**
+     * Handles JWT authentication by validating the token, session, and user.
+     *
+     * @param request The incoming HTTP request.
+     * @return True if authentication is successful, throws UnauthorizedException otherwise.
+     */
     private boolean handleJwtAuthentication(HttpServletRequest request) {
         Optional<String> tokenFromHeaders = getTokenFromHeaders(request);
 
@@ -73,6 +92,12 @@ public class AuthInterceptor implements HandlerInterceptor {
         return true;
     }
 
+    /**
+     * Retrieves and validates the JWT token from the request headers.
+     *
+     * @param request The incoming HTTP request.
+     * @return An Optional containing the token or an empty Optional.
+     */
     private Optional<String> getTokenFromHeaders(HttpServletRequest request) {
         String authHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
         if (authHeader == null || authHeader.isBlank()) {
@@ -87,11 +112,20 @@ public class AuthInterceptor implements HandlerInterceptor {
         return Optional.of(token);
     }
 
+    /**
+     * Enumeration representing the types of authentication for requests.
+     */
     private enum AuthType {
         JWT_TOKEN,
         NON_AUTHENTICATED
     }
 
+    /**
+     * Determines the type of authentication required based on method annotations.
+     *
+     * @param handlerMethod The handler method being executed.
+     * @return The type of authentication required for the method.
+     */
     private AuthType getRequestAuthType(HandlerMethod handlerMethod) {
         if (handlerMethod.getMethod().isAnnotationPresent(JwtAuthenticated.class)){
             return AuthType.JWT_TOKEN;
