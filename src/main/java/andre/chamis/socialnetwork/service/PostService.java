@@ -20,6 +20,9 @@ import java.time.Instant;
 import java.util.Date;
 import java.util.Optional;
 
+/**
+ * Service class responsible for managing posts.
+ */
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -28,6 +31,12 @@ public class PostService {
     private final UserService userService;
     private final PostRepository postRepository;
 
+    /**
+     * Creates a new post.
+     *
+     * @param createPostDTO The DTO containing post creation data.
+     * @return The created post DTO.
+     */
     public GetPostDTO createPost(CreatePostDTO createPostDTO){
         Long currentUserId = sessionService.getCurrentUserId();
 
@@ -48,6 +57,13 @@ public class PostService {
                 .withUser(user);
     }
 
+    /**
+     * Retrieves posts by user ID.
+     *
+     * @param ownerIdOptional An optional owner ID.
+     * @param pageable The paging and sorting information.
+     * @return A page of post DTOs.
+     */
     public Page<GetPostDTO> getPostsByUserId(Optional<Long> ownerIdOptional, Pageable pageable){
         Long ownerId = ownerIdOptional.orElse(sessionService.getCurrentUserId());
         Optional<User> userOptional = userService.findUserById(ownerId);
@@ -58,12 +74,23 @@ public class PostService {
         return posts.map(post -> new GetPostDTO().withPost(post).withUser(user));
     }
 
+    /**
+     * Deletes a post.
+     *
+     * @param deletePostDTO The DTO containing post deletion data.
+     */
     public void deletePost(DeletePostDTO deletePostDTO){
         Long currentUserId = sessionService.getCurrentUserId();
 
         postRepository.delete(deletePostDTO.postId(), currentUserId);
     }
 
+    /**
+     * Edits a post.
+     *
+     * @param editPostDTO The DTO containing post edit data.
+     * @return The edited post DTO.
+     */
     public GetPostDTO editPost(EditPostDTO editPostDTO){
         Optional<Post> postOptional = postRepository.findPostById(editPostDTO.postId());
         Post post = postOptional.orElseThrow(() -> new EntityNotFoundException("Post não encontrado com o id: " + editPostDTO.postId(), HttpStatus.BAD_REQUEST));
@@ -86,15 +113,30 @@ public class PostService {
                 .withUser(user);
     }
 
+    /**
+     * Deletes all posts.
+     */
     public void deleteAllPosts() {
         log.warn("Deleting all posts");
         postRepository.deleteAllPosts();
     }
 
+    /**
+     * Checks if a post exists by its ID.
+     *
+     * @param postId The ID of the post to check.
+     * @return True if the post exists, otherwise false.
+     */
     public boolean checkExistsPostById(Long postId){
         return postRepository.existsById(postId);
     }
 
+    /**
+     * Finds a post by its ID.
+     *
+     * @param postId The ID of the post to find.
+     * @return An optional containing the post if found.
+     */
     public Optional<Post> findPostById(Long postId){
         return postRepository.findPostById(postId);
     }

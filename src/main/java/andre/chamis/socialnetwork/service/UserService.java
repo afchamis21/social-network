@@ -19,6 +19,9 @@ import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+/**
+ * Service class responsible for managing user-related operations.
+ */
 @Service
 @RequiredArgsConstructor
 public class UserService {
@@ -26,6 +29,13 @@ public class UserService {
     private final SessionService sessionService;
     private final RefreshTokenService refreshTokenService;
 
+    /**
+     * Registers a new user based on the provided user data.
+     *
+     * @param createUserDTO The DTO containing user registration data.
+     * @return A DTO representing the registered user.
+     * @throws InvalidDataException If the provided user data is invalid.
+     */
     public GetUserDTO registerUser(CreateUserDTO createUserDTO) {
         if (!validateEmail(createUserDTO.email())){
             throw new InvalidDataException("Email inválido!", HttpStatus.BAD_REQUEST);
@@ -68,6 +78,12 @@ public class UserService {
         return GetUserDTO.fromUser(user);
     }
 
+    /**
+     * Validates the format of a password. Must be non-space and at least 6 characters long.
+     *
+     * @param password The password to validate.
+     * @return True if the password is valid, otherwise false.
+     */
     private boolean validatePassword(String password) {
         if (password == null) {
             return false;
@@ -79,6 +95,12 @@ public class UserService {
         return password.length() > 6 && matcher.matches();
     }
 
+    /**
+     * Validates the format of a username. Alphanumeric, hyphen, and underscore, at least 4 characters long.
+     *
+     * @param username The username to validate.
+     * @return True if the username is valid, otherwise false.
+     */
     private boolean validateUsername(String username) {
         if (username == null) {
             return false;
@@ -95,6 +117,12 @@ public class UserService {
         return matcher.matches();
     }
 
+    /**
+     * Validates the format of an email. Valid email format.
+     *
+     * @param email The email to validate.
+     * @return True if the email is valid, otherwise false.
+     */
     private boolean validateEmail(String email){
         if (email == null) {
             return false;
@@ -106,6 +134,12 @@ public class UserService {
         return matcher.matches();
     }
 
+    /**
+     * Validates user credentials during login.
+     *
+     * @param loginDTO The DTO containing user login credentials.
+     * @return An optional User object if credentials are valid, otherwise empty.
+     */
     public Optional<User> validateUserCredential(LoginDTO loginDTO){
         Optional<User> userOptional = userRepository.findUserByUsername(loginDTO.username());
 
@@ -123,16 +157,35 @@ public class UserService {
         return Optional.of(user);
     }
 
+    /**
+     * Finds the currently logged-in user.
+     *
+     * @return The currently logged-in user.
+     * @throws EntityNotFoundException If the user is not found.
+     */
     public User findCurrentUser(){
         Long currentUserId = sessionService.getCurrentUserId();
         Optional<User> userOptional = findUserById(currentUserId);
         return userOptional.orElseThrow(() -> new EntityNotFoundException(HttpStatus.FORBIDDEN));
     }
 
+    /**
+     * Finds a user by their ID.
+     *
+     * @param userId The ID of the user to find.
+     * @return An optional User object with the given ID, otherwise empty.
+     */
     public Optional<User> findUserById(Long userId) {
         return userRepository.findById(userId);
     }
 
+    /**
+     * Retrieves user information by ID, or the current user if no ID is provided.
+     *
+     * @param userIdOptional Optional ID of the user to retrieve information for.
+     * @return A DTO representing the user's information.
+     * @throws EntityNotFoundException If the user is not found.
+     */
     public GetUserDTO getUserById(Optional<Long> userIdOptional) {
         Long userId = userIdOptional.orElse(sessionService.getCurrentUserId());
         Optional<User> userOptional = findUserById(userId);
@@ -141,6 +194,12 @@ public class UserService {
         return GetUserDTO.fromUser(user);
     }
 
+    /**
+     * Updates user information based on the provided DTO.
+     *
+     * @param updateUserDTO The DTO containing updated user information.
+     * @return A DTO representing the updated user information.
+     */
     public GetUserDTO updateUser(UpdateUserDTO updateUserDTO) {
         boolean updated = false;
         boolean needsReauthentication = false;

@@ -22,6 +22,9 @@ import java.time.Instant;
 import java.util.Date;
 import java.util.Optional;
 
+/**
+ * Service class for managing comments on posts.
+ */
 @Service
 @RequiredArgsConstructor
 public class CommentService {
@@ -30,6 +33,12 @@ public class CommentService {
     private final SessionService sessionService;
     private final CommentRepository commentRepository;
 
+    /**
+     * Creates a new comment on a post.
+     *
+     * @param createCommentDTO The DTO containing comment creation data.
+     * @return DTO representation of the created comment.
+     */
     public GetCommentDTO createComment(CreateCommentDTO createCommentDTO){
         boolean postExists = postService.checkExistsPostById(createCommentDTO.postId());
         if (!postExists) {
@@ -54,6 +63,11 @@ public class CommentService {
                 .withUser(currentUser);
     }
 
+    /**
+     * Deletes a comment.
+     *
+     * @param deleteCommentDTO The DTO containing comment ID to be deleted.
+     */
     public void deleteComment(DeleteCommentDTO deleteCommentDTO){
         Long currentUserId = sessionService.getCurrentUserId();
 
@@ -71,6 +85,12 @@ public class CommentService {
         ServiceContext.addMessage("Comentário deletado!");
     }
 
+    /**
+     * Edits an existing comment.
+     *
+     * @param editCommentDTO The DTO containing comment ID and updated content.
+     * @return DTO representation of the edited comment.
+     */
     public GetCommentDTO editComment(EditCommentDTO editCommentDTO){
         Optional<Comment> commentOptional = commentRepository.findById(editCommentDTO.commentId());
         Comment comment = commentOptional.orElseThrow(() -> new EntityNotFoundException("Nenhum comentário encontrado com o id: " + editCommentDTO.commentId(), HttpStatus.BAD_REQUEST));
@@ -92,6 +112,13 @@ public class CommentService {
                 .withUser(currentUser);
     }
 
+    /**
+     * Retrieves all comments for a given post.
+     *
+     * @param postIdOptional The optional post ID to retrieve comments for.
+     * @param pageable The pagination parameters.
+     * @return A page of DTO representations of comments on the post.
+     */
     public Page<GetCommentDTO> findAllCommentsByPostId(Optional<Long> postIdOptional, Pageable pageable){
         Long postId = postIdOptional.orElseThrow(() -> new InvalidDataException("Faltando parâmetro de requisição postId", HttpStatus.BAD_REQUEST));
         Page<Comment> comments = commentRepository.findAllCommentsByPostId(postId, pageable);

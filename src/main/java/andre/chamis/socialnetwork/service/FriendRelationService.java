@@ -12,6 +12,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
+/**
+ * Service class for managing friend relations.
+ */
 @Service
 @RequiredArgsConstructor
 public class FriendRelationService {
@@ -19,11 +22,22 @@ public class FriendRelationService {
     private final FriendRelationRepository friendRelationRepository;
     private final UserService userService;
 
+    /**
+     * Removes the friend relation between the current user and the specified user.
+     *
+     * @param removeFriendDTO The DTO containing the user ID to remove as a friend.
+     */
     public void removeFriend(RemoveFriendDTO removeFriendDTO){
         Long currentUserId = sessionService.getCurrentUserId();
         friendRelationRepository.deleteAllFriendRelationsByUserIds(currentUserId, removeFriendDTO.userId());
     }
 
+    /**
+     * Lists all friends of the current user.
+     *
+     * @param pageable The pagination parameters.
+     * @return A page of DTO representations of user friends.
+     */
     public Page<GetUserDTO> listUserFriends(Pageable pageable){
         Long currentUserId = sessionService.getCurrentUserId();
         Page<FriendRelation> friendRelations = friendRelationRepository.findUserFriends(currentUserId, pageable);
@@ -35,10 +49,22 @@ public class FriendRelationService {
         return friends.map(GetUserDTO::fromUser);
     }
 
+    /**
+     * Checks if a friend relation exists between the given user IDs.
+     *
+     * @param userId1 The first user's ID.
+     * @param userId2 The second user's ID.
+     * @return True if a friend relation exists, otherwise false.
+     */
     public boolean existsFriendRelationByUserIds(Long userId1, Long userId2) {
         return friendRelationRepository.existsFriendRelationByUserIds(userId1, userId2);
     }
 
+    /**
+     * Creates a new friend relation.
+     *
+     * @param friendRelation The friend relation to be created.
+     */
     public void createFriendRelation(FriendRelation friendRelation) {
         friendRelationRepository.save(friendRelation);
     }

@@ -22,6 +22,9 @@ import java.time.Instant;
 import java.util.Date;
 import java.util.Optional;
 
+/**
+ * Service class for managing friend requests.
+ */
 @Service
 @RequiredArgsConstructor
 public class FriendRequestService {
@@ -30,6 +33,12 @@ public class FriendRequestService {
     private final FriendRequestRepository friendRequestRepository;
     private final UserService userService;
 
+    /**
+     * Sends a friend request from the current user to a target user.
+     *
+     * @param sendFriendRequestDTO The request DTO containing target user's ID.
+     * @return The DTO representation of the sent friend request.
+     */
     public GetFriendRequestDTO sendFriendRequest(SendFriendRequestDTO sendFriendRequestDTO){
         Long targetId = sendFriendRequestDTO.userId();
 
@@ -65,6 +74,11 @@ public class FriendRequestService {
 
     }
 
+    /**
+     * Accepts a friend request by its ID.
+     *
+     * @param acceptFriendRequestDTO The DTO containing the friend request's ID.
+     */
     public void acceptFriendRequest(AcceptFriendRequestDTO acceptFriendRequestDTO){
         Long requestId = acceptFriendRequestDTO.requestId();
         Optional<FriendRequest> friendRequestOptional = friendRequestRepository.findFriendRequestByRequestId(requestId);
@@ -72,6 +86,11 @@ public class FriendRequestService {
         acceptFriendRequest(friendRequest);
     }
 
+    /**
+     * Accepts a friend request and creates friend relations between users.
+     *
+     * @param friendRequest The friend request to accept.
+     */
     private void acceptFriendRequest(FriendRequest friendRequest){
         Long currentUserId = sessionService.getCurrentUserId();
 
@@ -99,16 +118,29 @@ public class FriendRequestService {
         deleteFriendRequest(friendRequest.getFriendRequestId());
     }
 
+
     private void deleteFriendRequest(Long friendRequestId){
         friendRequestRepository.deleteFriendRequest(friendRequestId);
     }
 
+    /**
+     * Cancels a friend request by its ID.
+     *
+     * @param cancelFriendRequestDTO The DTO containing the friend request's ID.
+     */
     public void cancelFriendRequest(CancelFriendRequestDTO cancelFriendRequestDTO) {
         deleteFriendRequest(cancelFriendRequestDTO.requestId());
 
         ServiceContext.addMessage("Solicitação cancelada!");
     }
 
+
+    /**
+     * Retrieves all friend requests to the current user.
+     *
+     * @param pageable The pagination parameters.
+     * @return A page of DTO representations of friend requests.
+     */
     public Page<GetFriendRequestDTO> findAllFriendRequestsToCurrentUser(Pageable pageable){
         User currentUser = userService.findCurrentUser();
 

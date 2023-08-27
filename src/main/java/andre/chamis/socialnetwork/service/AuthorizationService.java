@@ -15,6 +15,9 @@ import java.time.Instant;
 import java.util.Date;
 import java.util.Optional;
 
+/**
+ * Service class for user authentication, token management, and logout.
+ */
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -24,6 +27,12 @@ public class AuthorizationService {
     private final RefreshTokenService refreshTokenService;
     private final SessionService sessionService;
 
+    /**
+     * Authenticates a user and generates access and refresh tokens.
+     *
+     * @param loginDTO The DTO containing user login credentials.
+     * @return DTO containing access and refresh tokens.
+     */
     public TokensDTO authenticateUser(LoginDTO loginDTO) {
         Optional<User> userOptional = userService.validateUserCredential(loginDTO);
         User user = userOptional.orElseThrow(() -> new UnauthorizedException("Credenciais inválidas!"));
@@ -38,6 +47,12 @@ public class AuthorizationService {
         return new TokensDTO(accessToken, refreshToken);
     }
 
+    /**
+     * Refreshes access and refresh tokens.
+     *
+     * @param refreshTokensDTO The DTO containing the refresh token.
+     * @return DTO containing new access and refresh tokens.
+     */
     public TokensDTO refreshTokens(RefreshTokensDTO refreshTokensDTO) {
         String refreshToken = refreshTokensDTO.refreshToken();
         boolean isTokenValid = jwtService.validateRefreshToken(refreshToken);
@@ -76,6 +91,9 @@ public class AuthorizationService {
         return new TokensDTO(accessToken, refreshToken);
     }
 
+    /**
+     * Logs out the current user by deleting refresh token and session.
+     */
     public void logout() {
         User currentUser = userService.findCurrentUser();
         refreshTokenService.deleteTokenByUsername(currentUser.getUsername());

@@ -16,6 +16,9 @@ import org.springframework.stereotype.Service;
 import java.time.Instant;
 import java.util.Date;
 
+/**
+ * Service class for managing JSON Web Tokens (JWT).
+ */
 @Service
 @RequiredArgsConstructor
 public class JwtService {
@@ -34,6 +37,13 @@ public class JwtService {
         refreshTokenAlgorithm = Algorithm.HMAC256(jwtProperties.getRefreshToken().getEncryptionKey().getBytes());
     }
 
+    /**
+     * Creates an access token for a user session.
+     *
+     * @param username The username.
+     * @param session The user session.
+     * @return The generated access token.
+     */
     public String createAccessToken(String username, Session session){
         return JWT.create()
                 .withSubject(username)
@@ -46,6 +56,13 @@ public class JwtService {
                 )).sign(accessTokenAlgorithm);
     }
 
+    /**
+     * Creates a refresh token for a user session.
+     *
+     * @param username The username.
+     * @param session The user session.
+     * @return The generated refresh token.
+     */
     public String createRefreshToken(String username, Session session){
         return JWT.create()
                 .withSubject(username)
@@ -58,6 +75,12 @@ public class JwtService {
                 )).sign(refreshTokenAlgorithm);
     }
 
+    /**
+     * Validates an access token.
+     *
+     * @param token The access token to validate.
+     * @return True if the token is valid, otherwise false.
+     */
     public boolean validateAccessToken(String token) {
         try {
             JWTVerifier verifier = JWT.require(accessTokenAlgorithm).withIssuer(appName).build();
@@ -72,6 +95,12 @@ public class JwtService {
         }
     }
 
+    /**
+     * Validates a refresh token.
+     *
+     * @param token The refresh token to validate.
+     * @return True if the token is valid, otherwise false.
+     */
     public boolean validateRefreshToken(String token) {
         try {
             JWTVerifier verifier = JWT.require(refreshTokenAlgorithm).withIssuer(appName).build();
@@ -82,21 +111,45 @@ public class JwtService {
         }
     }
 
+    /**
+     * Validates a refresh token.
+     *
+     * @param token The refresh token to validate.
+     * @return True if the token is valid, otherwise false.
+     */
     public Date getTokenExpiresAt(String token) {
         DecodedJWT decodedJWT = JWT.decode(token);
         return decodedJWT.getExpiresAt();
     }
 
+    /**
+     * Retrieves the issuance time of a token.
+     *
+     * @param token The token to examine.
+     * @return The issuance time as a Date.
+     */
     public Date getTokenIssuedAt(String token) {
         DecodedJWT decodedJWT = JWT.decode(token);
         return decodedJWT.getIssuedAt();
     }
 
+    /**
+     * Retrieves the subject (username) of a token.
+     *
+     * @param token The token to examine.
+     * @return The subject (username) of the token.
+     */
     public String getTokenSubject(String token) {
         DecodedJWT decodedJWT = JWT.decode(token);
         return decodedJWT.getSubject();
     }
 
+    /**
+     * Retrieves the session ID from a token.
+     *
+     * @param token The token to examine.
+     * @return The session ID contained in the token.
+     */
     public Long getSessionIdFromToken(String token) {
         DecodedJWT decodedJWT = JWT.decode(token);
         return decodedJWT.getClaim(SESSION_PAYLOAD_KEY).asLong();
