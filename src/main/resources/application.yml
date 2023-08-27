@@ -1,6 +1,6 @@
 logging:
   level:
-    andre.chamis.socialnetwork: debug
+    andre.chamis: debug
     root: info
     org.springframework: warn
   pattern:

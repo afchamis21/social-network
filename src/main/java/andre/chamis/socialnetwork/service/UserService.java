@@ -133,10 +133,6 @@ public class UserService {
         return userRepository.findById(userId);
     }
 
-    public boolean userExistsById(Long userId) {
-        return userRepository.existsById(userId);
-    }
-
     public GetUserDTO getUserById(Optional<Long> userIdOptional) {
         Long userId = userIdOptional.orElse(sessionService.getCurrentUserId());
         Optional<User> userOptional = findUserById(userId);
