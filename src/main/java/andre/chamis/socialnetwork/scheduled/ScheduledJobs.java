@@ -12,6 +12,9 @@ import org.springframework.stereotype.Component;
 import java.time.Duration;
 import java.time.Instant;
 
+/**
+ * Component containing scheduled tasks to perform periodic operations.
+ */
 @Slf4j
 @Component
 @RequiredArgsConstructor
@@ -21,7 +24,10 @@ public class ScheduledJobs {
     private final UserRepository userRepository;
     private final PostService postService;
 
-    @Scheduled(cron = "0 0 0 * * *") // Every day at 00:00
+    /**
+     * Scheduled task to delete expired refresh tokens every day at 00:00.
+     */
+    @Scheduled(cron = "0 0 0 * * *")
     public void deleteExpiredRefreshTokens(){
         Instant executionStart = Instant.now();
         int deletedTokens = refreshTokenService.deleteAllExpired();
@@ -33,7 +39,10 @@ public class ScheduledJobs {
         );
     }
 
-    @Scheduled(cron = "0 0 0 * * *") // Every day at 00:00
+    /**
+     * Scheduled task to delete expired refresh tokens every day at 00:00.
+     */
+    @Scheduled(cron = "0 0 0 * * *")
     public void deleteExpiredSessions(){
         Instant executionStart = Instant.now();
         int deletedSessions = sessionService.deleteAllExpired();
@@ -45,7 +54,10 @@ public class ScheduledJobs {
         );
     }
 
-    @Scheduled(cron = " 0 0 0 * * *") // Every day at 00:00
+    /**
+     * Scheduled task to delete all posts every day at 00:00.
+     */
+    @Scheduled(cron = " 0 0 0 * * *")
     public void deleteAllPosts(){
         Instant executionStart = Instant.now();
         postService.deleteAllPosts();
@@ -56,7 +68,10 @@ public class ScheduledJobs {
         );
     }
 
-    @Scheduled(cron = "0 0 */2 * * *")// Every two hours
+    /**
+     * Scheduled task to reset the user cache every two hours.
+     */
+    @Scheduled(cron = "0 0 */2 * * *")
     public void resetCache(){
         Instant executionStart = Instant.now();
         int cachedUsers = userRepository.initializeCache();

@@ -8,9 +8,19 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 
+/**
+ * Configuration class for SpringDoc OpenAPI documentation generation.
+ * This configuration is active when the profile is not set to 'prod'.
+ */
 @Profile("!prod")
 @Configuration
 public class SpringDocConfig {
+
+    /**
+     * Creates and configures the OpenAPI documentation for the API.
+     *
+     * @return An instance of OpenAPI containing API information and security settings.
+     */
     @Bean
     public OpenAPI openAPI() {
         return new OpenAPI().components(
