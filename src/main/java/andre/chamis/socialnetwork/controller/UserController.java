@@ -16,6 +16,9 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.Optional;
 
+/**
+ * Controller class for user-related operations.
+ */
 @SecurityRequirement(name = "jwt-token")
 @RestController
 @JwtAuthenticated
@@ -24,12 +27,24 @@ import java.util.Optional;
 public class UserController {
     private final UserService userService;
 
-    @GetMapping("")
+    /**
+     * Retrieves information about the current user or a specified user.
+     *
+     * @param userId Optional parameter to specify the user ID.
+     * @return ResponseEntity containing the response message and user information.
+     */
+    @GetMapping
     public ResponseEntity<ResponseMessage<GetUserDTO>> getCurrentUser(@RequestParam Optional<Long> userId){
         GetUserDTO getUserDTO = userService.getUserById(userId);
         return ResponseMessageBuilder.build(getUserDTO, HttpStatus.OK);
     }
 
+    /**
+     * Registers a new user.
+     *
+     * @param createUserDTO DTO containing user registration information.
+     * @return ResponseEntity containing the response message and registered user information.
+     */
     @NonAuthenticated
     @PostMapping("register")
     public ResponseEntity<ResponseMessage<GetUserDTO>> registerUser(@RequestBody CreateUserDTO createUserDTO) {
@@ -37,6 +52,12 @@ public class UserController {
         return ResponseMessageBuilder.build(getUserDTO, HttpStatus.CREATED);
     }
 
+    /**
+     * Updates user information.
+     *
+     * @param updateUserDTO DTO containing updated user information.
+     * @return ResponseEntity containing the response message and updated user information.
+     */
     @PutMapping
     public ResponseEntity<ResponseMessage<GetUserDTO>> updateUser(@RequestBody UpdateUserDTO updateUserDTO){
         GetUserDTO getUserDTO = userService.updateUser(updateUserDTO);

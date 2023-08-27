@@ -14,6 +14,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+/**
+ * Controller class for friend relation-related operations.
+ */
 @SecurityRequirement(name = "jwt-token")
 @JwtAuthenticated
 @RestController
@@ -22,12 +25,25 @@ import org.springframework.web.bind.annotation.*;
 public class FriendRelationController {
     private final FriendRelationService friendRelationService;
 
+
+    /**
+     * Retrieves a page of friends for the current user.
+     *
+     * @param pageable Pageable object for pagination.
+     * @return ResponseEntity containing the response message and a page of friends.
+     */
     @GetMapping("all")
     public ResponseEntity<ResponseMessage<Page<GetUserDTO>>> acceptFriendRequest(Pageable pageable){
         Page<GetUserDTO> friends =  friendRelationService.listUserFriends(pageable);
         return ResponseMessageBuilder.build(friends, HttpStatus.OK);
     }
 
+    /**
+     * Removes a friend relation between the current user and another user.
+     *
+     * @param removeFriendDTO DTO containing information about the friend to be removed.
+     * @return ResponseEntity containing the response message.
+     */
     @DeleteMapping("remove")
     public ResponseEntity<ResponseMessage<Void>> cancelFriendRequest(@RequestBody RemoveFriendDTO removeFriendDTO){
         friendRelationService.removeFriend(removeFriendDTO);
