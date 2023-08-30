@@ -103,6 +103,7 @@ public class AuthInterceptor implements HandlerInterceptor {
         if (authHeader == null || authHeader.isBlank()) {
             return Optional.empty();
         }
+
         String[] authHeaderArray = authHeader.split(" ");
         if (!authHeaderArray[0].equalsIgnoreCase("bearer")){
             return Optional.empty();
