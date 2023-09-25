@@ -93,4 +93,14 @@ public class UserRepository {
     public boolean existsById(Long userId) {
         return userInMemoryCache.containsKey(userId);
     }
+
+    /**
+     * Finds a {@link User} by their email.
+     *
+     * @param email The username of the user to find.
+     * @return An {@link Optional} containing the found user, or empty if not found.
+     */
+    public Optional<User> findUserByEmail(String email) {
+        return userJpaRepository.findUserByEmail(email);
+    }
 }

@@ -2,6 +2,7 @@ package andre.chamis.socialnetwork.service;
 
 import andre.chamis.socialnetwork.domain.auth.property.JwtProperties;
 import andre.chamis.socialnetwork.domain.session.model.Session;
+import andre.chamis.socialnetwork.domain.user.model.User;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.algorithms.Algorithm;
@@ -44,7 +45,7 @@ public class JwtService {
      * @param session The user session.
      * @return The generated access token.
      */
-    public String createAccessToken(String username, Session session){
+    public String createAccessToken(String username, Session session) {
         return JWT.create()
                 .withSubject(username)
                 .withIssuer(appName)
@@ -54,6 +55,17 @@ public class JwtService {
                         jwtProperties.getAccessToken().getDuration(),
                         jwtProperties.getAccessToken().getUnit()
                 )).sign(accessTokenAlgorithm);
+    }
+
+    /**
+     * Creates an access token for a user session.
+     *
+     * @param user The user.
+     * @param session The user session.
+     * @return The generated access token.
+     */
+    public String createAccessToken(User user, Session session){
+        return createAccessToken(user.getUsername(), session);
     }
 
     /**
@@ -73,6 +85,17 @@ public class JwtService {
                         jwtProperties.getRefreshToken().getDuration(),
                         jwtProperties.getRefreshToken().getUnit()
                 )).sign(refreshTokenAlgorithm);
+    }
+
+    /**
+     * Creates a refresh token for a user session.
+     *
+     * @param user The user.
+     * @param session The user session.
+     * @return The generated refresh token.
+     */
+    public String createRefreshToken(User user, Session session){
+        return createRefreshToken(user.getUsername(), session);
     }
 
     /**
@@ -154,4 +177,5 @@ public class JwtService {
         DecodedJWT decodedJWT = JWT.decode(token);
         return decodedJWT.getClaim(SESSION_PAYLOAD_KEY).asLong();
     }
+
 }

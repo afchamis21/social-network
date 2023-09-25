@@ -1,17 +1,29 @@
 package andre.chamis.socialnetwork.service;
 
+import andre.chamis.socialnetwork.domain.auth.dto.GoogleLoginDTO;
 import andre.chamis.socialnetwork.domain.auth.dto.RefreshTokensDTO;
 import andre.chamis.socialnetwork.domain.auth.dto.TokensDTO;
+import andre.chamis.socialnetwork.domain.auth.property.OauthProperties;
 import andre.chamis.socialnetwork.domain.exception.UnauthorizedException;
 import andre.chamis.socialnetwork.domain.session.model.Session;
+import andre.chamis.socialnetwork.domain.user.dto.CreateUserDTO;
+import andre.chamis.socialnetwork.domain.user.dto.GetUserDTO;
 import andre.chamis.socialnetwork.domain.user.dto.LoginDTO;
 import andre.chamis.socialnetwork.domain.user.model.User;
+import com.google.api.client.auth.openidconnect.IdToken;
+import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
+import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
+import com.google.api.client.http.javanet.NetHttpTransport;
+import com.google.api.client.json.gson.GsonFactory;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
+import java.security.GeneralSecurityException;
 import java.time.Duration;
 import java.time.Instant;
+import java.util.Collections;
 import java.util.Date;
 import java.util.Optional;
 
@@ -26,6 +38,7 @@ public class AuthorizationService {
     private final JwtService jwtService;
     private final RefreshTokenService refreshTokenService;
     private final SessionService sessionService;
+    private final OauthProperties oauthProperties;
 
     /**
      * Authenticates a user and generates access and refresh tokens.
@@ -39,12 +52,12 @@ public class AuthorizationService {
 
         Session session = sessionService.createSession(user);
 
-        String accessToken = jwtService.createAccessToken(loginDTO.username(), session);
-        String refreshToken = jwtService.createRefreshToken(loginDTO.username(), session);
+        String accessToken = jwtService.createAccessToken(user, session);
+        String refreshToken = jwtService.createRefreshToken(user, session);
 
         refreshTokenService.saveTokenToDatabase(refreshToken);
 
-        return new TokensDTO(accessToken, refreshToken);
+        return new TokensDTO(accessToken, refreshToken, user);
     }
 
     /**
@@ -88,7 +101,7 @@ public class AuthorizationService {
             refreshToken = jwtService.createRefreshToken(username, session);
         }
 
-        return new TokensDTO(accessToken, refreshToken);
+        return new TokensDTO(accessToken, refreshToken, (GetUserDTO) null);
     }
 
     /**
@@ -98,5 +111,58 @@ public class AuthorizationService {
         User currentUser = userService.findCurrentUser();
         refreshTokenService.deleteTokenByUsername(currentUser.getUsername());
         sessionService.deleteCurrentSession();
+    }
+
+    /**
+     * Handles Google login by verifying the Google ID token, creating or retrieving a user, and generating a JWT token.
+     *
+     * @param googleLoginDTO The GoogleLoginDTO containing the Google ID token.
+     * @return JwtTokenDTO representing the JWT token response.
+     * @throws UnauthorizedException if authentication fails or an error occurs during the process.
+     */
+    public TokensDTO authenticateGoogleUser(GoogleLoginDTO googleLoginDTO) {
+        GoogleIdTokenVerifier verifier = new GoogleIdTokenVerifier.Builder(new NetHttpTransport(), GsonFactory.getDefaultInstance())
+                .setAudience(Collections.singletonList(oauthProperties.getGoogle().getClientId()))
+                .build();
+
+        try {
+            // Verify the Google ID token.
+            GoogleIdToken idToken = verifier.verify(googleLoginDTO.idToken());
+
+            if (idToken == null) {
+                throw new UnauthorizedException();
+            }
+
+            // Extract payload information from the ID token.
+            IdToken.Payload payload = idToken.getPayload();
+
+            Object payloadEmail = payload.get("email");
+
+            if (payloadEmail == null) {
+                throw new UnauthorizedException();
+            }
+
+            String email = (String) payloadEmail;
+
+            // Find or create a user based on the email.
+            Optional<User> userOptional = userService.findByEmail(email);
+
+            User user;
+            user = userOptional.orElseGet(() -> userService.createUser(new CreateUserDTO(
+                    email,
+                    email,
+                    ""
+            )));
+
+            // Create a session for the user.
+            Session session = sessionService.createSession(user);
+
+            // Generate an access token for the user.
+            String accessToken = jwtService.createAccessToken(user, session);
+            String refreshToken = jwtService.createRefreshToken(user, session);
+            return new TokensDTO(accessToken, refreshToken, user);
+        } catch (GeneralSecurityException | IOException e) {
+            throw new UnauthorizedException();
+        }
     }
 }

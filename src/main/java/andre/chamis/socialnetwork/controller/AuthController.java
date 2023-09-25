@@ -2,6 +2,7 @@ package andre.chamis.socialnetwork.controller;
 
 import andre.chamis.socialnetwork.domain.auth.annotation.JwtAuthenticated;
 import andre.chamis.socialnetwork.domain.auth.annotation.NonAuthenticated;
+import andre.chamis.socialnetwork.domain.auth.dto.GoogleLoginDTO;
 import andre.chamis.socialnetwork.domain.auth.dto.RefreshTokensDTO;
 import andre.chamis.socialnetwork.domain.auth.dto.TokensDTO;
 import andre.chamis.socialnetwork.domain.response.ResponseMessage;
@@ -35,6 +36,18 @@ public class AuthController {
     @PostMapping("login")
     public ResponseEntity<ResponseMessage<TokensDTO>> login(@RequestBody LoginDTO loginDTO)  {
         TokensDTO tokensDTO = authorizationService.authenticateUser(loginDTO);
+        return ResponseMessageBuilder.build(tokensDTO, HttpStatus.CREATED);
+    }
+
+    /**
+     * Handles Google login by receiving a GoogleLoginDTO as the request body and returning a JWT token response.
+     *
+     * @param googleLoginDTO The GoogleLoginDTO containing the Google ID token.
+     * @return ResponseEntity with a Response containing a JwtTokenDTO, representing the JWT token response.
+     */
+    @PostMapping("login/google")
+    public ResponseEntity<ResponseMessage<TokensDTO>> googleLogin(@RequestBody GoogleLoginDTO googleLoginDTO)  {
+        TokensDTO tokensDTO = authorizationService.authenticateGoogleUser(googleLoginDTO);
         return ResponseMessageBuilder.build(tokensDTO, HttpStatus.CREATED);
     }
 

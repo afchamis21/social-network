@@ -63,6 +63,10 @@ public class UserService {
             );
         }
 
+        return GetUserDTO.fromUser(createUser(createUserDTO));
+    }
+
+    User createUser(CreateUserDTO createUserDTO){
         BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder();
         String hashedPassword = bCryptPasswordEncoder.encode(createUserDTO.password());
 
@@ -73,9 +77,7 @@ public class UserService {
         user.setCreateDt(Date.from(Instant.now()));
         user.setUpdateDt(Date.from(Instant.now()));
 
-        user = userRepository.save(user);
-
-        return GetUserDTO.fromUser(user);
+        return userRepository.save(user);
     }
 
     /**
@@ -237,5 +239,15 @@ public class UserService {
         }
 
         return GetUserDTO.fromUser(user);
+    }
+
+    /**
+     * Finds a {@link User} by their email.
+     *
+     * @param email The username of the user to find.
+     * @return An {@link Optional} containing the found user, or empty if not found.
+     */
+    public Optional<User> findByEmail(String email) {
+        return userRepository.findUserByEmail(email);
     }
 }
