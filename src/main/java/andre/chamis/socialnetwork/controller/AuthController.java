@@ -51,7 +51,6 @@ public class AuthController {
         return ResponseMessageBuilder.build(tokensDTO, HttpStatus.CREATED);
     }
 
-
     /**
      * Refresh access and refresh tokens using a valid refresh token.
      *
@@ -63,7 +62,6 @@ public class AuthController {
         TokensDTO tokensDTO = authorizationService.refreshTokens(refreshTokensDTO);
         return ResponseMessageBuilder.build(tokensDTO, HttpStatus.OK);
     }
-
 
     /**
      * Logout a user by invalidating their refresh token and session.
