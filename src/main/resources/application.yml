@@ -9,5 +9,5 @@ logging:
 auth:
   oauth:
     google:
-      client-id: 1089636468821-vqasrtenc9rujnm8jaa31g593igg4kk6.apps.googleusercontent.com
-      client-secret: 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
+      client-id: ${GOOGLE_CLIENT_ID}
+      client-secret: ${GOOGLE_CLIENT_SECRET}
