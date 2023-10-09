@@ -50,7 +50,7 @@ public class PostsController {
      */
     @GetMapping
     public ResponseEntity<ResponseMessage<Page<GetPostDTO>>> findPosts(@RequestParam Optional<Long> ownerId, Pageable pageable){
-        Page<GetPostDTO> posts = postService.getPostsByUserId(ownerId, pageable);
+        Page<GetPostDTO> posts = postService.getPosts(ownerId, pageable);
         return ResponseMessageBuilder.build(posts, HttpStatus.OK);
     }
 

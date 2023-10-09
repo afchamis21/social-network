@@ -71,7 +71,6 @@ public class AuthInterceptor implements HandlerInterceptor {
         Optional<String> tokenFromHeaders = getTokenFromHeaders(request);
 
         String token = tokenFromHeaders.orElseThrow(UnauthorizedException::new);
-
         boolean isTokenValid = jwtService.validateAccessToken(token);
         if (!isTokenValid){
             throw new UnauthorizedException("Token inválido!");

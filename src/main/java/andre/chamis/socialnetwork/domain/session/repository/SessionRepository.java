@@ -2,6 +2,7 @@ package andre.chamis.socialnetwork.domain.session.repository;
 
 import andre.chamis.socialnetwork.domain.session.model.Session;
 import jakarta.annotation.PostConstruct;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
@@ -66,6 +67,7 @@ public class SessionRepository {
      *
      * @return The number of deleted sessions.
      */
+    @Transactional
     public int deleteAllExpired(){
         List<Session> deletedSessions = jpaRepository.deleteAllByExpireDtBefore(Date.from(Instant.now()));
         inMemoryCache.deleteFromList(deletedSessions, Session::getSessionId);

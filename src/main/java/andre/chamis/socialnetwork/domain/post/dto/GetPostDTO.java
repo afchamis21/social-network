@@ -57,4 +57,15 @@ public class GetPostDTO {
         this.owner = GetUserDTO.fromUser(user);
         return this;
     }
+
+    /**
+     * Fills in user-related information from a User entity.
+     *
+     * @param user The User entity to retrieve owner information from.
+     * @return The updated GetPostDTO instance.
+     */
+    public GetPostDTO withUser(GetUserDTO user) {
+        this.owner = user;
+        return this;
+    }
 }

@@ -1,6 +1,7 @@
 package andre.chamis.socialnetwork.domain.friend.relation.repository;
 
 import andre.chamis.socialnetwork.domain.friend.relation.model.FriendRelation;
+import andre.chamis.socialnetwork.domain.user.model.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -13,6 +14,7 @@ import org.springframework.stereotype.Repository;
 @RequiredArgsConstructor
 public class FriendRelationRepository {
     private final FriendRelationJpaRepository friendRelationJpaRepository;
+    private final FriendRelationJdbcRepository friendRelationJdbcRepository;
 
     /**
      * Retrieves a page of friends for a specified user.
@@ -53,5 +55,9 @@ public class FriendRelationRepository {
      */
     public void deleteAllFriendRelationsByUserIds(Long userId1, Long userId2) {
         friendRelationJpaRepository.deleteAllFriendRelationsByUserIds(userId1, userId2);
+    }
+
+    public Page<User> findUserPotentialFriends(Long currentUserId, Pageable pageable) {
+        return friendRelationJdbcRepository.findPotentialFriends(currentUserId, pageable);
     }
 }

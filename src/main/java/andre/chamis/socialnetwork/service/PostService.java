@@ -75,6 +75,23 @@ public class PostService {
     }
 
     /**
+     * Retrieves posts.
+     *
+     * @param ownerIdOptional An optional owner ID.
+     * @param pageable The paging and sorting information.
+     * @return A page of post DTOs.
+     */
+    public Page<GetPostDTO> getPosts(Optional<Long> ownerIdOptional, Pageable pageable){
+        if (ownerIdOptional.isPresent()) {
+            return getPostsByUserId(ownerIdOptional, pageable);
+        }
+
+        Page<Post> posts = postRepository.findPosts(pageable);
+
+        return posts.map(post -> new GetPostDTO().withPost(post).withUser(userService.getUserById(Optional.of(post.getOwnerId()))));
+    }
+
+    /**
      * Deletes a post.
      *
      * @param deletePostDTO The DTO containing post deletion data.

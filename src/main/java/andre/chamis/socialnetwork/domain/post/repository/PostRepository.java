@@ -1,6 +1,7 @@
 package andre.chamis.socialnetwork.domain.post.repository;
 
 import andre.chamis.socialnetwork.domain.post.model.Post;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -61,6 +62,7 @@ public class PostRepository {
     /**
      * Deletes all posts.
      */
+    @Transactional
     public void deleteAllPosts() {
         postJpaRepository.deleteAll();
     }
@@ -73,5 +75,15 @@ public class PostRepository {
      */
     public boolean existsById(Long postId) {
         return postJpaRepository.existsById(postId);
+    }
+
+    /**
+     * Retrieves a page of posts.
+     *
+     * @param pageable The pagination information.
+     * @return A page containing the posts owned by the user.
+     */
+    public Page<Post> findPosts(Pageable pageable) {
+        return postJpaRepository.findAll(pageable);
     }
 }

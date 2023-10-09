@@ -68,4 +68,11 @@ public class FriendRelationService {
     public void createFriendRelation(FriendRelation friendRelation) {
         friendRelationRepository.save(friendRelation);
     }
+
+    public Page<GetUserDTO> listPotentialFriends(Pageable pageable) {
+        Long currentUserId = sessionService.getCurrentUserId();
+        Page<User> potentialFriends = friendRelationRepository.findUserPotentialFriends(currentUserId, pageable);
+
+        return potentialFriends.map(GetUserDTO::fromUser);
+    }
 }

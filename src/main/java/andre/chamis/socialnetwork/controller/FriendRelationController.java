@@ -39,6 +39,18 @@ public class FriendRelationController {
     }
 
     /**
+     * Retrieves a page of potential friends for the current user.
+     *
+     * @param pageable Pageable object for pagination.
+     * @return ResponseEntity containing the response message and a page of potential friends.
+     */
+    @GetMapping("find")
+    public ResponseEntity<ResponseMessage<Page<GetUserDTO>>> findPotentialFriends(Pageable pageable){
+        Page<GetUserDTO> potentialFriends = friendRelationService.listPotentialFriends(pageable);
+        return ResponseMessageBuilder.build(potentialFriends, HttpStatus.OK);
+    }
+
+    /**
      * Removes a friend relation between the current user and another user.
      *
      * @param removeFriendDTO DTO containing information about the friend to be removed.

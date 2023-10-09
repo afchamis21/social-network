@@ -1,6 +1,7 @@
 package andre.chamis.socialnetwork.domain.auth.repository;
 
 import andre.chamis.socialnetwork.domain.auth.model.RefreshTokenEntity;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
@@ -30,6 +31,7 @@ public class RefreshTokenEntityRepository {
      *
      * @param refreshToken The token value of the refresh token to delete.
      */
+    @Transactional
     public void deleteRefreshToken(String refreshToken){
         jpaRepository.deleteByToken(refreshToken);
     }
@@ -49,6 +51,7 @@ public class RefreshTokenEntityRepository {
      *
      * @return The number of deleted refresh tokens.
      */
+    @Transactional
     public int deleteAllExpired() {
         return jpaRepository.deleteAllByExpireDtBefore(Date.from(Instant.now()));
     }
@@ -58,6 +61,7 @@ public class RefreshTokenEntityRepository {
      *
      * @param username The username of the user whose tokens are to be deleted.
      */
+    @Transactional
     public void deleteByUsername(String username){
         jpaRepository.deleteAllByUsername(username);
     }
