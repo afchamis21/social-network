@@ -5,7 +5,7 @@ import andre.chamis.socialnetwork.domain.exception.ExceptionWithStatusCode;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
-import java.util.Set;
+import java.util.List;
 
 /**
  * Utility class for building response messages with metadata.
@@ -68,7 +68,7 @@ public class ResponseMessageBuilder {
      */
     public static ResponseEntity<ResponseMessage<Void>> build(Exception exception){
         Metadata metadata = buildMetadata();
-
+        
         ResponseMessage<Void> responseMessage = new ResponseMessage<>();
         responseMessage.setMetadata(metadata);
 
@@ -81,7 +81,7 @@ public class ResponseMessageBuilder {
      * @return The metadata containing messages.
      */
     private static Metadata buildMetadata(){
-        Set<String> messages = ServiceContext.getContext().getMetadataMessages();
+        List<String> messages = ServiceContext.getContext().getMetadataMessages();
         Metadata metadata = new Metadata();
         metadata.setMessages(messages);
 

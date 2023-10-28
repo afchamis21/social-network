@@ -2,7 +2,7 @@ package andre.chamis.socialnetwork.domain.response;
 
 import lombok.Data;
 
-import java.util.Set;
+import java.util.List;
 
 /**
  * Represents metadata associated with a response, typically containing messages.
@@ -12,5 +12,5 @@ public class Metadata {
     /**
      * A set of messages included in the metadata.
      */
-    private Set<String> messages;
+    private List<String> messages;
 }
