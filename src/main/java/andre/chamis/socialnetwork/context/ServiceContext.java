@@ -1,6 +1,7 @@
 package andre.chamis.socialnetwork.context;
 
 import lombok.Data;
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.MDC;
 
@@ -18,7 +19,8 @@ public class ServiceContext {
     private static ThreadLocal<ServiceContext> threadLocal = new ThreadLocal<>();
 
     private String executionId;
-
+    
+    @Getter
     private Set<String> metadataMessages = new HashSet<>();
 
     private List<Exception> exceptions = new ArrayList<>();
@@ -100,15 +102,6 @@ public class ServiceContext {
      */
     public synchronized static void addException(Exception ex) {
         getContext().exceptions.add(ex);
-    }
-
-    /**
-     * Retrieves the metadata messages associated with the context.
-     *
-     * @return A set of metadata messages.
-     */
-    public Set<String> getMetadataMessages() {
-        return metadataMessages;
     }
 
     /**
