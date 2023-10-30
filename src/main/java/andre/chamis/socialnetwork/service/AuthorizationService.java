@@ -50,14 +50,7 @@ public class AuthorizationService {
         Optional<User> userOptional = userService.validateUserCredential(loginDTO);
         User user = userOptional.orElseThrow(() -> new UnauthorizedException("Credenciais inválidas!"));
 
-        Session session = sessionService.createSession(user);
-
-        String accessToken = jwtService.createAccessToken(user, session);
-        String refreshToken = jwtService.createRefreshToken(user, session);
-
-        refreshTokenService.saveTokenToDatabase(refreshToken);
-
-        return new TokensDTO(accessToken, refreshToken, user);
+        return generateSessionAndTokens(user);
     }
 
     /**
@@ -154,15 +147,23 @@ public class AuthorizationService {
                     ""
             )));
 
-            // Create a session for the user.
-            Session session = sessionService.createSession(user);
-
-            // Generate an access token for the user.
-            String accessToken = jwtService.createAccessToken(user, session);
-            String refreshToken = jwtService.createRefreshToken(user, session);
-            return new TokensDTO(accessToken, refreshToken, user);
+            return generateSessionAndTokens(user);
         } catch (GeneralSecurityException | IOException e) {
             throw new UnauthorizedException();
         }
+    }
+
+    private TokensDTO generateSessionAndTokens(User user) {
+        // Create a session for the user.
+        Session session = sessionService.createSession(user);
+
+        // Generate access and refresh token for the user.
+        String accessToken = jwtService.createAccessToken(user, session);
+        String refreshToken = jwtService.createRefreshToken(user, session);
+
+        // Saves refresh token on database.
+        refreshTokenService.saveTokenToDatabase(refreshToken);
+
+        return new TokensDTO(accessToken, refreshToken, user);
     }
 }
